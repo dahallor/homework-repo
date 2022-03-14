@@ -1,0 +1,25 @@
+<!--David A. Halloran, dh974@drexel.edu-->
+<!--CS530: DUI, Assignment 1-->
+
+{% extends 'base.html' %}
+{% set active = "Home" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+
+<section class="jumbotron">
+    <div class="text-center">
+        <h1 class="jumbotron-heading">Drexel Bikes</h1> <!--DH edited goat site to be about Drexel Bikes + updated image and buttons-->
+        <p class="lead text-muted">Hate that cars have too many wheels? Hate that unicycles have too few? Rent a Bike! Amount of wheels are juuuuust right!</p>
+        <p><img class="img-fluid" src="/static/img/philly.jpg"></p>
+        <p>
+            <a href="/about" class="btn btn-secondary my-2 mr-2">Learn about us</a>
+            <a href="/bikes" class="btn btn-secondary my-2">See our bikes</a>
+        </p>
+    </div>
+</section>
+
+{% endblock %}

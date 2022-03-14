@@ -1,0 +1,46 @@
+<!--David A. Halloran, dh974@drexel.edu-->
+<!--CS530: DUI, Assignment 2-->
+
+{% block header %}
+<script src="/static/js/rentView.js"></script>
+{% endblock %}
+
+{% extends 'base.html' %}
+{% set active = "Rent" %}
+
+{% block title %}
+Rent
+{% endblock %}
+
+{% block content %}
+
+<h1>Rent A Bike</h1>
+
+<p>Please select a rental from our available bikes below!</p>
+
+<div id="cards" class="container">
+    <table class="table">
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Available</th>
+            <th>Reset</th>
+        </tr>
+    </table>
+    <script>
+
+        $(function () {
+            const rentViewer = new rentViewer(10, 1);
+            rentViewer.load();
+        });
+    
+    </script>
+
+
+</div>
+
+
+
+
+
+{% endblock %}
