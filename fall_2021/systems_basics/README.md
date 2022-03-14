@@ -1,0 +1,1 @@
+Archive of System's Basics. This class covered MIPS assembly breifly but most assignments are in C. Covered making small programs in C, making your own shell (which I named "C Shell" and made the icon prompt a crab. Do you get it? Like, seashell? Cause the prompt is a shellfish? it's comedy gold), and socket programming
