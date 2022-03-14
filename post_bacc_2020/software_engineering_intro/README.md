@@ -1,0 +1,1 @@
+This class taught the basics of software design. The class assignments were all in Java. THis was my intro to unit tests but I went on to use them for higher level software tests (programs like hypothesis and pytest)
