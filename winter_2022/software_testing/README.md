@@ -1,0 +1,1 @@
+This class covered how to make relaiablke software and how to make better tests. Featured doing static analysis with programs like TLA+. Used Python pytest and python hypothesis to build property-based tests and automatic tests
