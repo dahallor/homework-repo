@@ -1,0 +1,3 @@
+-Surface normals are calculated in the calc_normals function of the calculations.py file. This starts on line 95.
+-the main.py file is the main file.
+-The language used is python

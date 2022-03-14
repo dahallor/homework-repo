@@ -1,0 +1,4 @@
+-The file used for this project was python
+-The program is defaulted to read a file called "patchPoints.txt" from same directory as the program.
+-The surface normals are calculated in the shading function located in calc_r_v2.py file. This starts on line 51
+-the main file is located in main.py

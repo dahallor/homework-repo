@@ -1,0 +1,4 @@
+-The programing language used was python
+-CG_hw5_r.py contains main
+-default in file is HW3_a_in.ps
+-writes to default file named out.iv and prints this file to standard out. You can redirect the whatever you wanna call the outfile

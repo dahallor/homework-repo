@@ -1,0 +1,3 @@
+-The file used for this project was python
+-The program is defaulted to read a file called "ctps_in.txt" from same directory as the program.
+-Automatically writes to a file called out.iv so no special commands are needed to get the file. Once it runs the info will be in there.
