@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1614994497 source:c:\users\alan turing\desktop\classes\drexel\502 data structures & algorithms\homework 7\homework 7\queue_tests.cpp
+	<iostream>
+	"queue.h"
+
+1614997054 c:\users\alan turing\desktop\classes\drexel\502 data structures & algorithms\homework 7\homework 7\queue.h
+
+1614992335 source:c:\users\alan turing\desktop\classes\drexel\502 data structures & algorithms\homework 7\homework 7\queue.cpp
+	"queue.h"
+	<iostream>
+
