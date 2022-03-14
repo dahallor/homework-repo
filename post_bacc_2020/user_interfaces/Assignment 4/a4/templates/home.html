@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% set active = "Home" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+
+<section class="jumbotron">
+    <div class="text-center">
+        <h1 class="jumbotron-heading">Charity Search</h1>
+        <p class="lead text-muted">Find a worthy charity today!</p>
+        <span>
+            <input id ="searchBar" name="searchBar" type="text" class="searchBar">
+                <a class="btn-primary">Search</a>
+        </span>
+        </p>
+    </div>
+</section>
+
+{% endblock %}
