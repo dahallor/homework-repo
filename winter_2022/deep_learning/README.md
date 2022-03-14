@@ -1,0 +1,1 @@
+This is an archive of my deep learning class where we implemeneted deep learning architecture from scrath. THis featured extensive use of numpy to do matrix multiplaication for forwward-backward propogation
