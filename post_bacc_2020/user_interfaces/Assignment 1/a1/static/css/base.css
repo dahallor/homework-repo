@@ -1,0 +1,43 @@
+/*David A. Halloran, dh974@drexel.edu
+CS530: DUI, Assignment 1*/
+
+body {
+    font-family: "Avenir";
+    font-size: 1rem;
+    background: #eee;
+}
+
+header {
+    background: #07294D; /*DH This was the drexel color hex code offered by the website but it looks different from pdf*/
+}
+
+.btn-primary {
+    background: #FFC600;
+    border-color: #FFC580;
+}
+
+.btn-primary:hover {
+    background: #FFC600;
+    border-color: #FFC580;
+}
+
+.navbar-expand-md .navbar-nav .nav-link {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    color: #FFC600; /*DH similar to above, this was the hex code offered by the website*/
+}
+
+.content {
+    padding: 2rem 1.5rem;
+    
+}
+
+.jumbotron {
+    padding: 1.5rem;
+    background: 0;
+}
+
+/*DH table image size fixed*/
+.image-size {
+    max-width: 100px;
+}

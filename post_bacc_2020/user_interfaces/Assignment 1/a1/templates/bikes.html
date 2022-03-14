@@ -1,0 +1,48 @@
+<!--David A. Halloran, dh974@drexel.edu-->
+<!--CS530: DUI, Assignment 1-->
+
+{% extends 'base.html' %}
+{% set active = "Bikes" %}
+
+{% block title %}
+Bikes
+{% endblock %}
+
+{% block content %}
+
+<h1>Our Bikes</h1>
+
+<p>We have the best selection of bikes around. Please see our selection below!</p>
+
+<div class="container">
+    <div class ="row">
+        <div class="col-xs-12">
+
+        <table class="table">
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Wheels</th>
+                <th>Size</th>
+                <th>Motorized</th>
+                <th>Folding</th>
+            <tbody>
+                
+                {% for entry in data.entries %}
+                <tr>
+                    <td><img src = {{ entry.image }} class="image-size"></td>
+                    <td>{{ entry.name }}</td>
+                    <td>{{ entry.wheels }}</td>
+                    <td>{{ entry.size }}</td>
+                    <td>{{ entry.motor }}</td>
+                    <td>{{ entry.folding }}</td>
+                </tr>
+                {% endfor %}
+                
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
