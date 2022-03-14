@@ -1,0 +1,62 @@
+<!--David A. Halloran, dh974@drexel.edu-->
+<!--CS530: DUI, Assignment 3-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Function Grapher</title>
+    <meta charset="utf-8"/>
+    <link href="static/lib/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="static/lib/jquery/jquery.min.js"></script>
+    <script src="static/lib/popper/popper.min.js"></script>
+    <script src="static/lib/bootstrap/bootstrap.min.js"></script>
+    <link href="static/css/grapher.css" rel="stylesheet">
+    <script src="static/js/grapher.js"></script>
+
+
+</head>
+
+<body>
+
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm">
+                    <nav class="navbar navbar-dark">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#">Function Grapher</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    
+    
+    <div id="grapher-wrapper">
+    </div>
+    <div class="equation">
+        <label for="a">y=</label>
+        <span><input id ="a" name="a" type="text" value="0" class="coefficent"></span>
+        <label for="b">x<sup>3</sup>+</label>
+        <span><input id ="b" name="b" type="text" value="0" class="coefficent"></span>
+        <label for="c">x<sup>2</sup>+</label>
+        <span><input id ="c" name="c" type="text" value="0" class="coefficent"></span>
+        <label for="d">x+</label>
+        <span><input id ="d" name="d" type="text" value="0" class="coefficent"></span>
+    </div>
+
+    <script>
+        $(function() {
+            new Grapher().build("#grapher-wrapper")
+        });
+
+    </script>
+
+</body>
+
+</html>

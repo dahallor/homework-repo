@@ -1,0 +1,33 @@
+/*David A. Halloran, dh974@drexel.edu
+CS530: DUI, Assignment 3*/
+
+body {
+    font-family: "Avenir";
+    font-size: 1rem;
+    background:lightgray;
+}
+
+header {
+    background: #354796;
+}
+
+
+canvas {
+    background: white;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    
+}
+
+.coefficent{
+    width: 50px;
+
+}
+
+.equation{
+    margin: auto;
+    text-align: center;
+}
