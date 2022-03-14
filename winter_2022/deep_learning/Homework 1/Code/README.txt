@@ -1,0 +1,7 @@
+-The default set up of the program is to answer question 7. Take medical data and pass through input to FC to sigmoid. 
+-It writes the answers to a text file in the current directory so you can see full results if you wish
+-Ways to alter the code are present but commented out. To reproduce answers for 5 and 6:
+---First, comment out the x variable for the medical data and uncomment the x varible for the test matrix
+---The Input and FC Layers have commented out code to check the test out puts that you can uncomment to check
+---For the activation layer, the whole section at the bottom of main will need to be uncommented. 
+-----It takes an input int 1-5 and will give you the output to the specified activation function
