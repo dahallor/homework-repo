@@ -1,5 +1,4 @@
 import numpy as np
-import math
 
 class InputLayer:
     def __init__(self):
@@ -14,8 +13,19 @@ class InputLayer:
         return data
 
     def splitData(self, data):
+        data = np.delete(data, 0, axis = 1)
+
+        trans = data.transpose()
+        Yt = trans[0]
+        Y = np.array([Yt])
+        Y = Y.transpose()
+        X = np.delete(data, 0, axis = 1)
+
         training_size = int(np.ceil(len(data) * (2/3)))
-        print(training_size)
-        training_data = data[:training_size]
-        validation_data = data[training_size:]
-        return training_data, validation_data
+
+        trainX = X[:training_size]
+        trainY = Y[:training_size]
+        validX = X[training_size:]
+        validY = Y[training_size:]
+
+        return trainX, trainY, validX, validY
