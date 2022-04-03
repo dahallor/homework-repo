@@ -29,3 +29,13 @@ class InputLayer:
         validY = Y[training_size:]
 
         return trainX, trainY, validX, validY
+
+    def addDummyValue(self, trainX):
+        trainX = np.insert(trainX, 0, 1, axis = 1)
+        return trainX
+        '''
+        trainY = np.insert(trainY, 0, 1, axis = 1)
+        validX = np.insert(validX, 0, 1, axis = 1)
+        validY = np.insert(validY, 0, 1, axis = 1)
+        return trainX, trainY, validX, validY
+        '''
