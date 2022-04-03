@@ -18,7 +18,8 @@ if __name__ == '__main__':
 
     validYhat = eval.calcYhat(validX, w)
     RMSE = eval.RSME(validY, validYhat)
-    #print(RMSE)
+    MAPE = eval.MAPE(validY, validYhat)
+    print(MAPE)
 
 
 
