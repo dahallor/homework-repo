@@ -30,9 +30,10 @@ class InputLayer:
 
         return trainX, trainY, validX, validY
 
-    def addDummyValue(self, trainX):
+    def addDummyValue(self, trainX, validX):
         trainX = np.insert(trainX, 0, 1, axis = 1)
-        return trainX
+        validX = np.insert(validX, 0, 1, axis = 1)
+        return trainX, validX
         '''
         trainY = np.insert(trainY, 0, 1, axis = 1)
         validX = np.insert(validX, 0, 1, axis = 1)

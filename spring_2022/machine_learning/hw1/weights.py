@@ -6,7 +6,6 @@ class Weights:
         pass
 
     def setWeights(self, X, Y):
-        print(X, Y)
         Xt = X.transpose()
         product = Xt.dot(X)
         product = product.astype(float)
