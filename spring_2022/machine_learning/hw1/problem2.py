@@ -7,19 +7,20 @@ if __name__ == '__main__':
     weights = Weights()
     eval = Evaluation()
 
-
+    #Problem 2
     data = inputLayer.getCSVItems()
-    shuffled_data = inputLayer.shuffleData(data)
-    trainX, trainY, validX, validY = inputLayer.splitData(shuffled_data)
-    trainX, validX = inputLayer.addDummyValue(trainX, validX)
-    # trainX, trainY, validX, validY = inputLayer.addDummyValue(trainX, trainY, validX, validY)
+    shuffled_data = inputLayer.shuffleData(data, 0)
+    trainX, trainY, validX, validY = inputLayer.splitDataDirect(shuffled_data)
+    trainX, validX = inputLayer.addDummyValueDirect(trainX, validX)
 
     w = weights.setWeights(trainX, trainY)
 
     validYhat = eval.calcYhat(validX, w)
     RMSE = eval.RSME(validY, validYhat)
     MAPE = eval.MAPE(validY, validYhat)
+    print(RMSE)
     print(MAPE)
+
 
 
 

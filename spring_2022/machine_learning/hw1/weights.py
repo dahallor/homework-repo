@@ -7,9 +7,9 @@ class Weights:
 
     def setWeights(self, X, Y):
         Xt = X.transpose()
-        product = Xt.dot(X)
+        product = Xt@X
         product = product.astype(float)
         product2 = product ** -1
-        product3 = product2.dot(Xt) 
-        w = product3.dot(Y)
+        product3 = product2@Xt 
+        w = product3@Y
         return w

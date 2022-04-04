@@ -21,17 +21,6 @@ class Evaluation():
         MSE = (1/N) * sum
         RMSE = np.sqrt(MSE)
 
-        '''
-        dif = Yhat - Y
-        #print(Yhat, Y, N)
-        print(dif)
-        difT = dif.transpose()
-        all = difT * dif
-        print(all)
-        RMSE = np.sqrt((1/N) * (dif.transpose() * dif))
-
-        '''
-
         return RMSE
 
     def MAPE(self, Y, Yhat):
