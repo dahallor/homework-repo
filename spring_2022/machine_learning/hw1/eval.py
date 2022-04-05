@@ -9,6 +9,9 @@ class Evaluation():
         Yhat = X.dot(w)
         return Yhat
 
+    def SE(self, Y, Yhat):
+        pass
+    
     def RSME(self, Y, Yhat):
         N = Y.shape[0]
         sum = 0
