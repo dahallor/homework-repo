@@ -53,19 +53,30 @@ class InputLayer:
     def S_folds(self, index, S, X, Y):
         foldsX = np.reshape(X, (-1, (len(X)//S), len(X[0])))
         foldsY = np.reshape(Y, (-1, (len(Y)//S), len(Y[0])))
-        foldsXvalid = foldsX[index-1]
-        foldsYvalid = foldsY[index-1]
+        foldsXvalid = foldsX[index]
+        foldsYvalid = foldsY[index]
         foldsXtrain = np.delete(foldsX, index-1, axis = 0)
         foldsYtrain = np.delete(foldsY, index-1, axis = 0)
 
         return foldsXtrain, foldsYtrain, foldsXvalid, foldsYvalid
+    
+    def reassemble(self, trainX, trainY):
+        heightX = len(trainX) * len(trainX[0])
+        widthX = len(trainX[0][0])
+        trainX = np.reshape(trainX, (heightX, widthX))
 
-        '''
-        print(foldsXvalid)
-        print("------------------------------------------------------------")
-        print(foldsX)
-        print("------------------------------------------------------------")
-        print(foldsXtrain)
-        input()
-        '''
+        heightY = len(trainY) * len(trainY[0])
+        widthY= len(trainY[0][0])
+        trainY = np.reshape(trainY, (heightY, widthY))
+        
+        return trainX, trainY
+        
+
+    def getDimensionality(self, S, X):
+        foldsX = np.reshape(X, (-1, (len(X)//S), len(X[0])))
+        size = len(foldsX)
+        return size
+
+
+
         

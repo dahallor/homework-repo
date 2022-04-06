@@ -14,13 +14,11 @@ if __name__ == '__main__':
     trainX, validX = inputLayer.addDummyValueDirect(trainX, validX)
 
     w = weights.setWeights(trainX, trainY)
-    print(w)
 
     validYhat = eval.calcYhat(validX, w)
     RMSE = eval.RSME(validY, validYhat)
     MAPE = eval.MAPE(validY, validYhat)
-    print(RMSE)
-    print(MAPE)
+
 
 
 

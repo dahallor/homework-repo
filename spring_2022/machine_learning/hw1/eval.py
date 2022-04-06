@@ -9,8 +9,12 @@ class Evaluation():
         Yhat = X.dot(w)
         return Yhat
 
-    def SE(self, Y, Yhat):
-        pass
+    def SE(self, Y, Yhat, errors):
+        for i in range(len(Y)):
+            J = Y[i] - Yhat[i]
+            errors.append(J)
+
+        return J
     
     def RSME(self, Y, Yhat):
         N = Y.shape[0]
