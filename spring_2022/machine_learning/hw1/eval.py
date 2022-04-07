@@ -12,9 +12,9 @@ class Evaluation():
     def SE(self, Y, Yhat, errors):
         for i in range(len(Y)):
             J = Y[i] - Yhat[i]
-            errors.append(J)
+            errors = np.append(errors, J)
 
-        return J
+        return errors
     
     def RSME(self, Y, Yhat):
         N = Y.shape[0]
@@ -30,6 +30,12 @@ class Evaluation():
 
         return RMSE
 
+    def RMSEfromSE(self, SEs):
+        sum = np.sum(SEs)
+        mean = (1/len(SEs)) * sum
+        root = np.sqrt(mean)
+        return root
+
     def MAPE(self, Y, Yhat):
         N = Y.shape[0]
         sum = 0
@@ -41,3 +47,16 @@ class Evaluation():
         
         MAPE = (1/N) * sum
         return MAPE
+
+    def SMAPE(self, Y, Yhat):
+        N = Y.shape[0]
+        sum = 0
+
+        for i in range(len(Y)):
+            top = abs(Yhat[i] - Y[i])
+            bottom = (abs(Y[i]) - abs(Yhat[i]))/2
+            value = top/bottom
+            sum += value
+
+        SMAPE = (1/N) * sum
+        return SMAPE

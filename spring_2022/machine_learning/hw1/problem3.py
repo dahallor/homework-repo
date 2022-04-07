@@ -8,6 +8,7 @@ if __name__ == '__main__':
     eval = Evaluation()
 
     S = 20
+    RMSEs = np.array([])
 
     #For S Folds
     for i in range(1, S+1, 1):
@@ -23,13 +24,14 @@ if __name__ == '__main__':
             
             w = weights.setWeights(trainX, trainY)
 
-            '''
+            
             validYhat = eval.calcYhat(validX, w)
             errors = eval.SE(validY, validYhat, errors)
-            print(errors)
-            #print("trainX: {}\nvalidX: {}\ntrainY: {}\n validY: {}\n".format(trainX, validX, trainY, validY))
-            #print("trainY: {}\n validY: {}\n".format(trainY, validY))
-            '''
+
+        root = eval.RMSEfromSE(errors)
+        RMSEs = np.append(RMSEs, root)
+        
+            
 
 
 
