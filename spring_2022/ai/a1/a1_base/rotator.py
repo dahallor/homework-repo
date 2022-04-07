@@ -40,10 +40,16 @@ class State:
             elif state[i] == " ":
                 line.append(None)
             elif i == len(state) - 1:
-                line.append(int(state[i]))
+                try:
+                    line.append(float(state[i]))
+                except Exception:
+                    line.append(state[i])
                 matrix.append(line)
             else:
-                line.append(int(state[i]))
+                try:
+                    line.append(float(state[i]))
+                except Exception:
+                    line.append(state[i])
         
         return matrix
 
