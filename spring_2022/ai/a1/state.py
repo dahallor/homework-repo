@@ -1,22 +1,3 @@
-import sys
-
-DEFAULT_STATE = '12345|1234 |12354'
-
-
-class Action:
-    """
-    Represents an action that can be performed on a state.
-    """
-
-    def __init__(self):
-        """
-        Initializes an action. Additional arguments will be needed to specify the details
-        of the action. You may find it preferable to subclass this class for each of
-        the possible action types.
-        """
-        pass  # replace with your code
-
-
 class State:
     """
     Represents a state.
@@ -57,24 +38,3 @@ class State:
     def is_goal(self, matrix):
         #this is easier with numpy so see if it can be used first
         pass
-
-
-if __name__ == '__main__':
-
-    cmd = sys.argv[1]
-    if cmd:
-
-        state_string = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_STATE
-        state = State(state_string)
-
-        if cmd == 'print':
-            print(state.currentState)
-        elif cmd == 'goal':
-            matrix = state.convertToMatrix()
-            print()
-        elif cmd == 'actions':
-            pass  # replace with your code
-        elif cmd.startswith('walk'):
-            pass  # replace with your code
-
-        
