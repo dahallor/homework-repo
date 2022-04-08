@@ -18,10 +18,12 @@ if __name__ == '__main__':
         if cmd == 'print':
             print(state.currentState)
         elif cmd == 'goal':
-            pass  # replace with your code
+            matrix = state.convertToMatrix()
+            print(matrix)
+            print(state.is_goal(matrix))
         elif cmd == 'actions':
             pass  # replace with your code
         elif cmd.startswith('walk'):
             pass  # replace with your code
 
-        state.convertToMatrix()
+        
