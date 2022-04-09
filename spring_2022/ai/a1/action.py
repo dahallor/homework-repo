@@ -11,4 +11,17 @@ class Action:
         """
         pass  # replace with your code
 
+    def __str__(self):
+        pass
+
+    class SlideAction:
+        def __init__(self):
+            pass
+
+    class RotateAction:
+        def __init__(self):
+            pass
+
+
+
 

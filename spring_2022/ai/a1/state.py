@@ -6,6 +6,7 @@ class State:
     def __init__(self, string):
         self.currentState = string
         self.goal = False
+        self.matrix = []
 
     def setCurrentState(self, data):
         self.currentState = data
@@ -28,7 +29,7 @@ class State:
                         line.append(state[i])
             if i == len(state) - 1:
                 matrix.append(line)
-
+        self.matrix = matrix
         return matrix
  
     def is_goal(self, matrix):
@@ -36,7 +37,8 @@ class State:
         height = len(matrix)
 
         if len(matrix) == 0:
-            return False
+            self.goal = False
+            return self.goal
 
         for i in range(width):
             top_value = matrix[0][i]
@@ -47,6 +49,7 @@ class State:
                 if current_value == top_value:
                     continue
                 else:
-                    return False
-
-        return True
+                    self.goal = False
+                    return self.goal
+        self.goal = True
+        return self.goal
