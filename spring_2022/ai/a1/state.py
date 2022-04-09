@@ -15,30 +15,22 @@ class State:
         matrix = []
         line = []
         for i in range(len(state)):
-            if state[i] == "|":
-                matrix.append(line)
-                line = []
-                continue
-            if state[i] == " ":
-                line.append(None)
+            match state[i]:
+                case "|":
+                    matrix.append(line)
+                    line = []
+                case " ":
+                    line.append(None)
+                case _:
+                    try:
+                        line.append(float(state[i]))
+                    except Exception:
+                        line.append(state[i])
             if i == len(state) - 1:
-                try:
-                    line.append(float(state[i]))
-                    matrix.append(line)
-                    return matrix
-                except Exception:
-                    line.append(state[i])
-                    matrix.append(line)
-                    return matrix
-            else:
-                try:
-                    line.append(float(state[i]))
-                except Exception:
-                    line.append(state[i])
-            
-        
-        
-        
+                matrix.append(line)
+
+        return matrix
+ 
     def is_goal(self, matrix):
         width = len(matrix[0])
         height = len(matrix)

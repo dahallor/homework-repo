@@ -19,7 +19,6 @@ if __name__ == '__main__':
             print(state.currentState)
         elif cmd == 'goal':
             matrix = state.convertToMatrix()
-            print(matrix)
             print(state.is_goal(matrix))
         elif cmd == 'actions':
             pass  # replace with your code
