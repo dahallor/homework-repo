@@ -1,8 +1,10 @@
 import numpy as np
+import pdb
 
 class InputLayer:
     def __init__(self):
-        pass
+        self.std = 0
+        self.mean = 0
 
     def getCSVItems(self):
         data = np.genfromtxt('x06Simple.csv', dtype = int, delimiter = ",", skip_header = 1, )
@@ -78,5 +80,17 @@ class InputLayer:
         return size
 
 
-
+    def setMeanAndSTD(self, data):
+        self.mean = np.mean(data, axis = 0)
+        self.std = np.std(data, axis = 0)
         
+    def zScore(self, data):
+        z = np.array([])
+        for i in range(len(data)):
+            #pdb.set_trace()
+            temp = np.subtract(data[i], self.mean)/self.std
+            z = np.append(z, temp)
+
+        z = z.reshape((len(data), 4))
+
+        return z
