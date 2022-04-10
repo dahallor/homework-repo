@@ -5,8 +5,6 @@ from action import *
 DEFAULT_STATE = '12345|1234 |12354'
 
 
-
-
 if __name__ == '__main__':
 
     cmd = sys.argv[1]
@@ -14,14 +12,15 @@ if __name__ == '__main__':
 
         state_string = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_STATE
         state = State(state_string)
+        matrix = state.convertToMatrix()
+        action = Action(matrix)
 
         if cmd == 'print':
             print(state.currentState)
         elif cmd == 'goal':
-            matrix = state.convertToMatrix()
             print(state.is_goal(matrix))
         elif cmd == 'actions':
-            pass  # replace with your code
+            state.actions()
         elif cmd.startswith('walk'):
             pass  # replace with your code
 
