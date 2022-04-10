@@ -61,6 +61,14 @@ class InputLayer:
         foldsYtrain = np.delete(foldsY, index-1, axis = 0)
 
         return foldsXtrain, foldsYtrain, foldsXvalid, foldsYvalid
+
+    def N_folds(self, index, X, Y):
+        validX = X[index]
+        validY = Y[index]
+        trainX = np.delete(X, index, axis = 0)
+        trainY = np.delete(Y, index, axis = 0)
+
+        return trainX, trainY, validX, validY
     
     def reassemble(self, trainX, trainY):
         heightX = len(trainX) * len(trainX[0])

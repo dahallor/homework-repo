@@ -15,9 +15,22 @@ if __name__ == '__main__':
 
     w = weights.setWeights(trainX, trainY)
 
+    trainYhat = eval.calcYhat(trainX, w)
     validYhat = eval.calcYhat(validX, w)
-    RMSE = eval.RSME(validY, validYhat)
-    MAPE = eval.MAPE(validY, validYhat)
+
+    RMSEtrain = eval.RSME(trainY, trainYhat)
+    MAPEtrain = eval.MAPE(trainY, trainYhat)
+    RMSEvalid = eval.RSME(validY, validYhat)
+    MAPEvalid = eval.MAPE(validY, validYhat)
+
+    print("Training Set:")
+    print("RMSE: {}".format(RMSEtrain))
+    print("MAPE: {}".format(MAPEtrain))
+    print()
+    print("Validation Set:")
+    print("RMSE: {}".format(RMSEvalid))
+    print("MAPE: {}".format(MAPEvalid))
+
 
 
 

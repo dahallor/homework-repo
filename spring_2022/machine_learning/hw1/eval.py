@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import pdb
 
 class Evaluation():
     def __init__(self):
@@ -11,7 +12,7 @@ class Evaluation():
 
     def SE(self, Y, Yhat, errors):
         for i in range(len(Y)):
-            J = Y[i] - Yhat[i]
+            J = math.pow((Y[i] - Yhat[i]), 2)
             errors = np.append(errors, J)
 
         return errors
@@ -34,6 +35,7 @@ class Evaluation():
         sum = np.sum(SEs)
         mean = (1/len(SEs)) * sum
         root = np.sqrt(mean)
+        #pdb.set_trace()
         return root
 
     def MAPE(self, Y, Yhat):

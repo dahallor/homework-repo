@@ -20,6 +20,7 @@ if __name__ == '__main__':
 
     k = 1
     RMSEs = np.array([])
+    MAPEs = np.array([])
     for i in range(len(validX)):
         sum = 0
         beta = np.array([])
@@ -30,14 +31,21 @@ if __name__ == '__main__':
             d *= -1
             beta_point = np.exp(d)
             beta = np.append(beta, beta_point)
-        #beta = beta.reshape(len(beta), 1)
         beta = np.diag(beta)
         w = weights.setLocalWeights(trainX, trainY, beta)
 
         Yhat = eval.calcYhat(validX, w)
         errors = eval.SE(validY, Yhat, errors)
-        print(errors)
-        input()
+        error = eval.RMSEfromSE(errors)
+        MAPE = eval.MAPE(validY, Yhat)
+        RMSEs = np.append(RMSEs, error)
+        MAPEs = np.append(MAPEs, MAPE)
+
+    for i in range(len(validX)):
+        print(i + 1)
+        print("Sample: {}".format(validX[i]))
+        print("RMSE: {}".format(RMSEs[i]))
+        print("MAPE: {}".format(MAPEs[i]))
 
         
 
