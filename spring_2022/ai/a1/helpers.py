@@ -37,6 +37,7 @@ class Aux:
     def setBoarderSpace(self, state):
         state.boarderingSpace = []
         x, y = self.findNull(state)
+        #pdb.set_trace()
 
         #Up
         try:

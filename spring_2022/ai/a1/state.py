@@ -71,26 +71,27 @@ class State:
                     break
                       
         if array[0] == "s":
-            print(self.currentState)
             direction = ""
             for i in range(len(self.boarderingSpace)):
                 if self.boarderingSpace[i][0] == array[1] and self.boarderingSpace[i][1] == array[2]:
                     direction = self.boarderingSpace[i][2]
-            #pdb.set_trace()
+            
+            x1 = array[1]
+            y1 = array[2]
+            x2 = array[3]
+            y2 = array[4]
             while(self.currentState not in self.previousStates):
-                
-                #try:
-                action.slide(self, aux, array[1], array[2], array[3], array[4])
-                aux.setBoarderSpace(self)
-                array[3], array[4] = aux.findNull(self)
-                array[1], array[2] = aux.continueSlide(self, direction, array[3], array[4])
-                
                 print(self.currentState)
-                #aux.convertToMatrix(self)
-                #aux.clone(self)
-                pdb.set_trace()
-                #except Exception:
-                    #break
+                action.slide(self, aux, x1, y1, x2, y2)
+                aux.setBoarderSpace(self)
+                #pdb.set_trace()
+                for i in range(len(self.boarderingSpace)):
+                    if direction == self.boarderingSpace[i][2]:
+                        x1 = self.boarderingSpace[i][0]
+                        y1 = self.boarderingSpace[i][1]
+                        
+                x2, y2 = aux.findNull(self)
+                
 
 
 
