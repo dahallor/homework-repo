@@ -1,3 +1,5 @@
+import pdb
+
 class Aux:
     def __init__(self):
         pass
@@ -27,21 +29,21 @@ class Aux:
     def clone(self, state):
         string = self.__str__(state, "return str")
         state.currentState = string
+        #pdb.set_trace()
+
+
 
 
     def setBoarderSpace(self, state):
         state.boarderingSpace = []
-        for i in range(len(state.matrix)):
-            for j in range(len(state.matrix[i])):
-                if state.matrix[i][j] == None:
-                    y = i
-                    x = j
+        x, y = self.findNull(state)
+
         #Up
         try:
             yPrime = y - 1
             if yPrime < 0:
                 raise Exception
-            state.boarderingSpace.append([x, yPrime])
+            state.boarderingSpace.append([x, yPrime, "up"])
         except Exception:
             pass
 
@@ -50,7 +52,7 @@ class Aux:
             yPrime = y + 1
             if yPrime > len(state.matrix) - 1:
                 raise Exception
-            state.boarderingSpace.append([x, yPrime])
+            state.boarderingSpace.append([x, yPrime, "down"])
         except Exception:
             pass
 
@@ -59,7 +61,7 @@ class Aux:
             xPrime = x + 1
             if xPrime > len(state.matrix[y]) - 1:
                 raise Exception
-            state.boarderingSpace.append([xPrime, y])
+            state.boarderingSpace.append([xPrime, y, "right"])
         except Exception:
             pass
 
@@ -68,9 +70,40 @@ class Aux:
             xPrime = x - 1
             if xPrime < 0:
                 raise Exception
-            state.boarderingSpace.append([xPrime, y])
+            state.boarderingSpace.append([xPrime, y, "left"])
         except Exception:
             pass
+
+    def continueSlide(self, state, direction, x, y):
+        match direction:
+            case "up":
+                yPrime = y - 1
+                if yPrime < 0:
+                    raise Exception
+                return x, yPrime
+
+            case "down":
+                yPrime = y + 1
+                if yPrime > len(state.matrix) - 1:
+                    raise Exception
+                return x, yPrime
+
+            case "right":
+                xPrime = x + 1
+                if xPrime > len(state.matrix[y]) - 1:
+                    raise Exception
+                return xPrime, y
+
+            case "left":
+                xPrime = x - 1
+                if xPrime < 0:
+                    raise Exception
+                return xPrime, y
+
+            case _:
+                raise Exception
+
+
         
     def convertToMatrix(self, state):
         localState = state.currentState
@@ -99,9 +132,23 @@ class Aux:
         actions.append(action[0])
         for i in range(len(action)):
             try:
-                digit = int(action[i])
-                actions.append(digit)
+                if action[i-1] == "-":
+                    digit = action[i-1] + action[i]
+                    actions.append(int(digit))
+                else:
+                    digit = int(action[i])
+                    actions.append(digit)
             except Exception:
                 continue
 
         return actions
+
+    def findNull(self, state):
+        for i in range(len(state.matrix)):
+            for j in range(len(state.matrix[i])):
+                if state.matrix[i][j] == None:
+                    y = i
+                    x = j
+
+        return x, y
+

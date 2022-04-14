@@ -40,6 +40,7 @@ class State:
                     x = j
                     y = i
         for i in range(len(self.matrix)):
+            #pdb.set_trace()
             left = "rotate({}, -1)".format(i)
             right = "rotate({}, 1)".format(i)
             self.possibleActions.append(left)
@@ -58,6 +59,7 @@ class State:
         self.actions(aux, "no print")
         currentAction = self.possibleActions[index]
 
+
         array = aux.extractAction(index, self)
         if array[0] == "r":
             while(self.currentState not in self.previousStates):
@@ -69,12 +71,26 @@ class State:
                     break
                       
         if array[0] == "s":
+            print(self.currentState)
+            direction = ""
+            for i in range(len(self.boarderingSpace)):
+                if self.boarderingSpace[i][0] == array[1] and self.boarderingSpace[i][1] == array[2]:
+                    direction = self.boarderingSpace[i][2]
+            #pdb.set_trace()
             while(self.currentState not in self.previousStates):
+                
+                #try:
+                action.slide(self, aux, array[1], array[2], array[3], array[4])
+                aux.setBoarderSpace(self)
+                array[3], array[4] = aux.findNull(self)
+                array[1], array[2] = aux.continueSlide(self, direction, array[3], array[4])
+                
                 print(self.currentState)
-                try:
-                    action.slide(self, aux, array[1], array[2], array[3], array[4])
-                except Exception:
-                    break
+                #aux.convertToMatrix(self)
+                #aux.clone(self)
+                pdb.set_trace()
+                #except Exception:
+                    #break
 
 
 
