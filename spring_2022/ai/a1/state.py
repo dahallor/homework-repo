@@ -1,89 +1,27 @@
+import pdb
+
 class State:
     def __init__(self, string):
-        self.currentState = string
+        self.startState = string
+        self.currentState = self.startState
         self.goal = False
         self.matrix = []
         self.boarderingSpace = []
-
-    def setCurrentState(self, data):
-        self.currentState = data
-
-    def setBoarderSpace(self):
-        self.boarderingSpace = []
-        for i in range(len(self.matrix)):
-            for j in range(len(self.matrix[i])):
-                if self.matrix[i][j] == None:
-                    y = i
-                    x = j
-        #Up
-        try:
-            yPrime = y - 1
-            if yPrime < 0:
-                raise Exception
-            self.boarderingSpace.append([x, yPrime])
-        except Exception:
-            pass
-
-        #Down
-        try:
-            yPrime = y + 1
-            if yPrime > len(self.matrix) - 1:
-                raise Exception
-            self.boarderingSpace.append([x, yPrime])
-        except Exception:
-            pass
-
-        #Right
-        try:
-            xPrime = x + 1
-            if xPrime > len(self.matrix[y]) - 1:
-                raise Exception
-            self.boarderingSpace.append([xPrime, y])
-        except Exception:
-            pass
-
-        #Left
-        try:
-            xPrime = x - 1
-            if xPrime < 0:
-                raise Exception
-            self.boarderingSpace.append([xPrime, y])
-        except Exception:
-            pass
-        
-    def convertToMatrix(self):
-        state = self.currentState
-        matrix = []
-        line = []
-        for i in range(len(state)):
-            match state[i]:
-                case "|":
-                    matrix.append(line)
-                    line = []
-                case " ":
-                    line.append(None)
-                case _:
-                    try:
-                        line.append(int(state[i]))
-                    except Exception:
-                        line.append(state[i])
-            if i == len(state) - 1:
-                matrix.append(line)
-        self.matrix = matrix
-        return matrix
+        self.possibleActions = []
+        self.previousStates = []
  
-    def is_goal(self, matrix):
-        width = len(matrix[0])
-        height = len(matrix)
+    def is_goal(self):
+        width = len(self.matrix[0])
+        height = len(self.matrix)
 
-        if len(matrix) == 0:
+        if len(self.matrix) == 0:
             self.goal = False
             return self.goal
 
         for i in range(width):
-            top_value = matrix[0][i]
+            top_value = self.matrix[0][i]
             for j in range(1, height):
-                current_value = matrix[j][i]
+                current_value = self.matrix[j][i]
                 if current_value == None:
                     continue
                 if current_value == top_value:
@@ -94,20 +32,54 @@ class State:
         self.goal = True
         return self.goal
 
-    def actions(self):
-        self.setBoarderSpace()
+    def actions(self, aux, option):
+        aux.setBoarderSpace(self)
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
                 if self.matrix[i][j] == None:
                     x = j
                     y = i
         for i in range(len(self.matrix)):
-            print("rotate({}, -1)".format(i))
-            print("rotate({}, 1)".format(i))
+            left = "rotate({}, -1)".format(i)
+            right = "rotate({}, 1)".format(i)
+            self.possibleActions.append(left)
+            self.possibleActions.append(right)
+            if option == "print":
+                print(left)
+                print(right)
         for i in range(len(self.boarderingSpace)):
-            print("slide({}, {}, {}, {})".format(self.boarderingSpace[i][0], self.boarderingSpace[i][1], x, y))
+            slide = "slide({}, {}, {}, {})".format(self.boarderingSpace[i][0], self.boarderingSpace[i][1], x, y)
+            self.possibleActions.append(slide)
+            if option == "print":
+                print(slide)
 
 
-    def execute(action):
-        pass
+    def execute(self, action, index, aux):
+        self.actions(aux, "no print")
+        currentAction = self.possibleActions[index]
+
+        array = aux.extractAction(index, self)
+        if array[0] == "r":
+            while(self.currentState not in self.previousStates):
+                print(self.currentState)
+                try:
+                    action.rotate(self, aux, array[1], array[2])
+
+                except Exception:
+                    break
+                      
+        if array[0] == "s":
+            while(self.currentState not in self.previousStates):
+                print(self.currentState)
+                try:
+                    action.slide(self, aux, array[1], array[2], array[3], array[4])
+                except Exception:
+                    break
+
+
+
+
+
+
+    
             
