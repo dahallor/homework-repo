@@ -2,6 +2,7 @@ import numpy as np
 from input import *
 from weights import *
 from obj import *
+from eval import *
 import sys
 import pdb
 import math
@@ -16,6 +17,7 @@ if __name__ == '__main__':
 
     trainX, trainY, validX, validY = inputLayer.splitDataSpam(data)
     weights = Weights(trainX)
+    evaluation = Eval()
     inputLayer.setMeanAndSTD(trainX)
     trainX = inputLayer.zScore(trainX)
     validX = inputLayer.zScore(validX)
@@ -25,22 +27,28 @@ if __name__ == '__main__':
     epoch_list = []
     eta = .0001
     while epoch <= 1000000:
-        pdb.set_trace()
-        try:
+        if epoch % 100 == 0:
+            print("Epoch: {}".format(epoch))
+            #pdb.set_trace()
+        if epoch > 3:
             change = abs(logLoss.meanTrain[epoch-1] - logLoss.meanTrain[epoch-2])
             if change < math.pow(2, -32):
                 break
-        except Exception:
-            pass
 
-        trainYhat = weights.calcYhat(trainX)
-        validYhat = weights.calcYhat(validX)
+        trainYhat = evaluation.calcYhat(trainX, weights)
+        validYhat = evaluation.calcYhat(validX, weights)
 
-        J1 = logLoss.eval(trainY, trainYhat, "train")
-        J2 = logLoss.eval(validY, validYhat, "valid")
+        logLoss.eval(trainY, trainYhat, "train")
+        logLoss.eval(validY, validYhat, "valid")
+
+        weights.set_dJdW(trainX, trainY, trainYhat)
+        weights.set_dJdb(trainY, trainYhat)
+
+        weights.updateWeightsAndBias(eta)
 
         epoch_list.append(epoch)
         epoch += 1
+
 
 
 
