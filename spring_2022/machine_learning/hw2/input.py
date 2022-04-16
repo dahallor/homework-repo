@@ -4,6 +4,10 @@ class InputLayer:
     def __init__(self):
         self.mean = 0
         self.std = 0
+        self.trainX = 0
+        self.trainY = 0
+        self.validX = 0
+        self.validY = 0
 
     def getSpamItems(self):
         data = np.genfromtxt('spambase.data', delimiter = ",")
@@ -27,24 +31,29 @@ class InputLayer:
 
         training_size = int(np.ceil(len(data) * (2/3)))
 
-        trainX = X[:training_size]
-        trainY = Y[:training_size]
-        validX = X[training_size:]
-        validY = Y[training_size:]
-
-        return trainX, trainY, validX, validY
+        self.trainX = X[:training_size]
+        self.trainY = Y[:training_size]
+        self.validX = X[training_size:]
+        self.validY = Y[training_size:]
 
     def setMeanAndSTD(self, data):
         self.mean = np.mean(data, axis = 0)
         self.std = np.std(data, axis = 0)
         
-    def zScore(self, data):
+    def zScore(self, inputType):
         z = np.array([])
+        if inputType == "train":
+            data = self.trainX
+        if inputType == "valid":
+            data = self.validX
         for i in range(len(data)):
-            #pdb.set_trace()
             temp = np.subtract(data[i], self.mean)/self.std
             z = np.append(z, temp)
 
         z = z.reshape((len(data), len(data[0])))
 
-        return z
+        if inputType == "train":
+            self.trainX = z
+        if inputType == "valid":
+            self.validX = z
+        
