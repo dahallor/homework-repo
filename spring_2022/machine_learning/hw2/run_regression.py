@@ -28,7 +28,7 @@ class Run:
 
             #Statistics Evaluations
             evaluation.setPosAndNeg(IL.trainY, trainYhat)
-            evaluation.setAccuracy(len(IL.trainY))
+            evaluation.setAccuracy()
             evaluation.setPrecision()
             evaluation.setRecall()
             evaluation.setF_Measure()

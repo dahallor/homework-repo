@@ -43,8 +43,9 @@ class Eval():
             if int(Y[i][0]) != int(newYhat[i][0]) and int(Y[i][0]) == 0:
                 self.ratio["F+"] += 1
 
-    def setAccuracy(self, N):
+    def setAccuracy(self):
         sum = self.ratio["T+"] + self.ratio["T-"]
+        N = sum + self.ratio["F+"] + self.ratio["F-"]
         self.accuracy = (1/N) * sum
 
 
@@ -61,7 +62,11 @@ class Eval():
         self.recall = TP/(TP+FN) 
 
     def setF_Measure(self):
-        self.f = (2 * self.precision * self.recall)/(self.precision + self.recall)         
+        self.f = (2 * self.precision * self.recall)/(self.precision + self.recall)   
+
+    def precision_recall(self):
+        #TODO: Implement later
+        pass      
 
     
 
