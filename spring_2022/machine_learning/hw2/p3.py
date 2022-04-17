@@ -20,15 +20,16 @@ if __name__ == '__main__':
 
     IL.alterIrisData()
     data = IL.getIrisItems()
-    pdb.set_trace()
     data = IL.shuffleData(data, 0)
     IL.splitDataSpam(data)
     weights = Weights(IL.trainX)
+    #pdb.set_trace()
 
 
     IL.setMeanAndSTD(IL.trainX)
     IL.zScore("train")
     IL.zScore("valid")
+    #pdb.set_trace()
 
     run.binaryLogisticalRegression(logLoss, evaluation, weights, IL)
     plot.plotMean(logLoss, run.epoch_list)

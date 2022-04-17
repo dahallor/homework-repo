@@ -32,8 +32,6 @@ class InputLayer:
                     temp[-1] = 3
                 case _:
                     continue
-            #temp.append("\n")
-            #pdb.set_trace()
             for i in range(len(temp)):
                 if i == len(temp)-1:
                     temp[i] = int(temp[i])
