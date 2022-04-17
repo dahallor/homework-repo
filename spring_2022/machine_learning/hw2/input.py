@@ -1,4 +1,5 @@
 import numpy as np
+import pdb
 
 class InputLayer:
     def __init__(self):
@@ -13,8 +14,35 @@ class InputLayer:
         data = np.genfromtxt('spambase.data', delimiter = ",")
         return data
 
+    def alterIrisData(self):
+        f = open("iris.data", "r")
+        g = open("irisAltered.csv", "w")
+        lines = f.readlines()
+        for line in lines:
+            temp = line.split(",")
+            value = temp[-1]
+            value = value.strip("\n")
+            print(value)
+            match value:
+                case "Iris-setosa":
+                    temp[-1] = 1
+                case "Iris-versicolor":
+                    temp[-1] = 2
+                case  "Iris-virginica":
+                    temp[-1] = 3
+                case _:
+                    continue
+            #temp.append("\n")
+            #pdb.set_trace()
+            for i in range(len(temp)):
+                if i == len(temp)-1:
+                    temp[i] = int(temp[i])
+                else:
+                    temp[i] = float(temp[i])
+            g.write("{:.1f},{:.1f},{:.1f},{:.1f},{}\n".format(temp[0], temp[1], temp[2], temp[3], temp[4]))
+
     def getIrisItems(self):
-        data = np.genfromtxt('iris.data', delimiter = ",")
+        data = np.genfromtxt('irisAltered.csv', delimiter = ",")
         return data
 
     def shuffleData(self, data, num):

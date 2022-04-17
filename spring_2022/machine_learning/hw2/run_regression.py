@@ -8,7 +8,7 @@ class Run:
         self.eta = eta
 
     def binaryLogisticalRegression(self, logLoss, evaluation, weights, IL):
-        while self.epoch <= 500:
+        while self.epoch <= 1000000:
             #Check Conditionals
             if self.epoch % 100 == 0:
                 print("Epoch: {}\nAccuracy: {}\nPrecision: {}\nRecall: {}\nF-Measure: {}\n".format(self.epoch, evaluation.accuracy, evaluation.precision, evaluation.recall, evaluation.f))

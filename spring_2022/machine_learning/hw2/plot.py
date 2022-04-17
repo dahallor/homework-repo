@@ -11,3 +11,7 @@ class Plot:
         plt.plot(epoch, log.meanValid, label = "Validation", color = "orange")
         plt.legend()
         plt.show()
+    
+    def plotPrecisionVSRecall(self):
+        #TODO: Implement later
+        pass 
