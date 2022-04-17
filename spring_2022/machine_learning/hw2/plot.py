@@ -16,7 +16,8 @@ class Plot:
     def plotPrecisionVSRecall(self, eval):
         plt.xlabel("Recall")
         plt.ylabel("Precision")
-        plt.plot(eval.recall_PR, eval.prec_PR, color = "blue")
+        plt.plot(eval.recall_PR_train, eval.prec_PR_train, label = "Training", color = "blue")
+        plt.plot(eval.recall_PR_valid, eval.prec_PR_valid, label = "Validation", color = "orange")
         plt.title(label = "Precision-Recall Chart")
         plt.xticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
         plt.yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])

@@ -49,7 +49,12 @@ class Run:
             evaluation.setPosAndNeg(IL.trainY, trainYhat, (i/10))
             evaluation.setPrecision()
             evaluation.setRecall()
-            evaluation.setPR()
-        print(evaluation.prec_PR, evaluation.recall_PR)
+            evaluation.setPR("train")
+
+        for i in range(11):
+            evaluation.setPosAndNeg(IL.validY, validYhat, (i/10))
+            evaluation.setPrecision()
+            evaluation.setRecall()
+            evaluation.setPR("valid")
             
 

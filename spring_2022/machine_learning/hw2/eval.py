@@ -13,8 +13,10 @@ class Eval():
         self.precision = 0
         self.recall = 0
         self.f = 0
-        self.prec_PR = []
-        self.recall_PR = []
+        self.prec_PR_train = []
+        self.recall_PR_train = []
+        self.prec_PR_valid = []
+        self.recall_PR_valid = []
         self.thresholds = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
     def calcProbability(self, X, weights):
@@ -74,9 +76,13 @@ class Eval():
     def setF_Measure(self):
         self.f = (2 * self.precision * self.recall)/(self.precision + self.recall)   
 
-    def setPR(self):
-        self.prec_PR.append(self.precision)
-        self.recall_PR.append(self.recall)
+    def setPR(self, type):
+        if type == "train":
+            self.prec_PR_train.append(self.precision)
+            self.recall_PR_train.append(self.recall)
+        if type == "valid":
+            self.prec_PR_valid.append(self.precision)
+            self.recall_PR_valid.append(self.recall)           
 
     
 
