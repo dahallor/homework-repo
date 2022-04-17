@@ -29,6 +29,7 @@ if __name__ == '__main__':
 
     run.binaryLogisticalRegression(logLoss, evaluation, weights, IL)
     plot.plotMean(logLoss, run.epoch_list)
+    plot.plotPrecisionVSRecall(evaluation)
 
 
 

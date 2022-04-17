@@ -8,10 +8,10 @@ class Run:
         self.eta = eta
 
     def binaryLogisticalRegression(self, logLoss, evaluation, weights, IL):
-        while self.epoch <= 1000000:
+        while self.epoch <= 100:
             #Check Conditionals
-            if self.epoch % 100 == 0:
-                print("Epoch: {}\nAccuracy: {}\nPrecision: {}\nRecall: {}\nF-Measure: {}\n".format(self.epoch, evaluation.accuracy, evaluation.precision, evaluation.recall, evaluation.f))
+            if self.epoch % 1000000 == 0:
+                print("Epoch: {}\n".format(self.epoch))
                 
             if self.epoch > 3:
                 change = abs(logLoss.meanTrain[self.epoch-1] - logLoss.meanTrain[self.epoch-2])
@@ -19,19 +19,12 @@ class Run:
                     break
 
             #Get Yhat        
-            trainYhat = evaluation.calcYhat(IL.trainX, weights)
-            validYhat = evaluation.calcYhat(IL.validX, weights)
+            trainYhat = evaluation.calcProbability(IL.trainX, weights)
+            validYhat = evaluation.calcProbability(IL.validX, weights)
 
             #Objective Function Evaluation
             logLoss.eval(IL.trainY, trainYhat, "train")
             logLoss.eval(IL.validY, validYhat, "valid")
-
-            #Statistics Evaluations
-            evaluation.setPosAndNeg(IL.trainY, trainYhat)
-            evaluation.setAccuracy()
-            evaluation.setPrecision()
-            evaluation.setRecall()
-            evaluation.setF_Measure()
 
             #Set Weight and Bias derivatives
             weights.set_dJdW(IL.trainX, IL.trainY, trainYhat)
@@ -43,4 +36,20 @@ class Run:
             #Incremenet values
             self.epoch_list.append(self.epoch)
             self.epoch += 1
+
+        #Statistics Evaluations
+        evaluation.setPosAndNeg(IL.trainY, trainYhat, .5)
+        evaluation.setAccuracy()
+        evaluation.setPrecision()
+        evaluation.setRecall()
+        evaluation.setF_Measure()
+        print("Accuracy: {}\nPrecision: {}\nRecall: {}\nF-Measure: {}\n".format(evaluation.accuracy, evaluation.precision, evaluation.recall, evaluation.f))
+
+        for i in range(11):
+            evaluation.setPosAndNeg(IL.trainY, trainYhat, (i/10))
+            evaluation.setPrecision()
+            evaluation.setRecall()
+            evaluation.setPR()
+        print(evaluation.prec_PR, evaluation.recall_PR)
+            
 
