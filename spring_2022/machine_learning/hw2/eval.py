@@ -27,6 +27,58 @@ class Eval():
 
         return Yhat
 
+    def calcMulticlass(self, X, weights, type):
+        Yhat = np.zeros((len(X), 1), dtype = 'float')
+        for i in range(len(X)):
+            match type:
+                case "1v2":
+                    exponent = -1 * (np.matmul(X[i], weights.W_1v2) + weights.b_1v2)
+                    Yhat[i] = 1/(1 + np.exp(exponent))
+                case "1v3":
+                    exponent = -1 * (np.matmul(X[i], weights.W_1v3) + weights.b_1v3)
+                    Yhat[i] = 1/(1 + np.exp(exponent))
+                case "2v3":
+                    exponent = -1 * (np.matmul(X[i], weights.W_2v3) + weights.b_2v3) 
+                    Yhat[i] = 1/(1 + np.exp(exponent))
+                case "valid":
+                    class1 = 0
+                    class2 = 0
+                    class3 = 0
+
+                    exponent = -1 * (np.matmul(X[i], weights.W_1v2) + weights.b_1v2)
+                    positive = 1/(1 + np.exp(exponent))
+                    negative = 1 - positive
+                    class1 += positive
+                    class2 += negative
+
+                    exponent = -1 * (np.matmul(X[i], weights.W_1v3) + weights.b_1v3)
+                    positive = 1/(1 + np.exp(exponent))
+                    negative = 1 - positive
+                    class1 += positive
+                    class3 += negative
+
+                    exponent = -1 * (np.matmul(X[i], weights.W_2v3) + weights.b_2v3)
+                    positive = 1/(1 + np.exp(exponent))
+                    negative = 1 - positive
+                    class2 += positive
+                    class3 += negative
+                    
+                    class1 /= 2
+                    class2 /= 2
+                    class3 /= 2
+
+                    if max(class1, class2, class3) == class1:
+                        Yhat[i] = 1
+                    if max(class1, class2, class3) == class2:
+                        Yhat[i] = 2
+                    if max(class1, class2, class3) == class3:
+                        Yhat[i] = 3
+                    
+                case _:
+                    raise Exception              
+
+        return Yhat
+
     def setPosAndNeg(self, Y, Yhat, thresh):
         newYhat = []
         for i in range(len(Yhat)):

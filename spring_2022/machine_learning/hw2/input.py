@@ -22,7 +22,6 @@ class InputLayer:
             temp = line.split(",")
             value = temp[-1]
             value = value.strip("\n")
-            print(value)
             match value:
                 case "Iris-setosa":
                     temp[-1] = 1

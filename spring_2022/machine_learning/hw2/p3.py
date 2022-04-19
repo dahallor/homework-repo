@@ -15,7 +15,7 @@ if __name__ == '__main__':
     IL = InputLayer()
     logLoss = LogLoss()
     plot = Plot()
-    run = Run(0, [], .0001)
+    run = Run(0, [], .01)
     evaluation = Eval()
 
     IL.alterIrisData()
@@ -31,5 +31,5 @@ if __name__ == '__main__':
     IL.zScore("valid")
     #pdb.set_trace()
 
-    run.binaryLogisticalRegression(logLoss, evaluation, weights, IL)
-    plot.plotMean(logLoss, run.epoch_list)
+    run.multiclassLogisticalRegression(logLoss, evaluation, weights, IL)
+    #plot.plotMean(logLoss, run.epoch_list)
