@@ -12,6 +12,16 @@ class Plot:
         plt.title(label = "Mean Log Loss Vs. Epoch")
         plt.legend()
         plt.show()
+
+    def plotMeanMulticlass(self, log, epoch):
+        plt.xlabel("Epoch")
+        plt.ylabel("Mean Log Loss")
+        plt.plot(epoch, log.mean1v2, label = "1v2", color = "blue")
+        plt.plot(epoch, log.mean1v3, label = "1v3", color = "red")
+        plt.plot(epoch, log.mean2v3, label = "2v3", color = "green")
+        plt.title(label = "Mean Log Loss Vs. Epoch")
+        plt.legend()
+        plt.show()
     
     def plotPrecisionVSRecall(self, eval):
         plt.xlabel("Recall")

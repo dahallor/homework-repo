@@ -32,4 +32,5 @@ if __name__ == '__main__':
     #pdb.set_trace()
 
     run.multiclassLogisticalRegression(logLoss, evaluation, weights, IL)
+    plot.plotMeanMulticlass(logLoss, run.epoch_list)
     #plot.plotMean(logLoss, run.epoch_list)
