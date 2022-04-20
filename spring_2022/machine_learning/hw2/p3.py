@@ -28,13 +28,19 @@ if __name__ == '__main__':
     IL.setMulticlassData("2v3")
 
     weights = Weights(IL.trainX)
-    pdb.set_trace()
+    #pdb.set_trace()
 
 
     IL.setMeanAndSTD(IL.trainX)
     IL.zScore("train")
     IL.zScore("valid")
-    #pdb.set_trace()
+    IL.zScore("train1v2")
+    IL.zScore("train1v3")
+    IL.zScore("train2v3")
+    IL.zScore("valid1v2")
+    IL.zScore("valid1v3")
+    IL.zScore("valid2v3")
+    pdb.set_trace()
 
     run.multiclassLogisticalRegression(logLoss, evaluation, weights, IL)
     plot.plotMeanMulticlass(logLoss, run.epoch_list)

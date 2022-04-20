@@ -86,7 +86,6 @@ class InputLayer:
                         self.trainY1v2 = np.append(self.trainY1v2, 0)
                     if i == len(self.trainX) - 1:
                         size = len(self.trainY1v2)
-                        print(self.trainX1v2)
                         self.trainX1v2 = np.reshape(self.trainX1v2, (size, len(self.trainX[0])))
                         self.trainY1v2 = np.reshape(self.trainY1v2, (size, 1))
                 case "1v3":
@@ -159,18 +158,50 @@ class InputLayer:
         
     def zScore(self, inputType):
         z = np.array([])
-        if inputType == "train":
-            data = self.trainX
-        if inputType == "valid":
-            data = self.validX
+        match inputType:
+            case "train":
+                data = self.trainX
+            case "valid":
+                data = self.validX
+            case "train1v2":
+                data = self.trainX1v2
+            case "train1v3":
+                data = self.trainX1v3
+            case "train2v3":
+                data = self.trainX2v3
+            case "valid1v2":
+                data = self.validX1v2
+            case "valid1v3":
+                data = self.validX1v3
+            case "valid2v3":
+                data = self.validX2v3
+            case _:
+                raise Exception
+
+
         for i in range(len(data)):
             temp = np.subtract(data[i], self.mean)/self.std
             z = np.append(z, temp)
 
         z = z.reshape((len(data), len(data[0])))
 
-        if inputType == "train":
-            self.trainX = z
-        if inputType == "valid":
-            self.validX = z
+        match inputType:
+            case "train":
+                self.trainX = z
+            case "valid":
+                self.validX = z
+            case "train1v2":
+                self.trainX1v2 = z
+            case "train1v3":
+                self.trainX1v3 = z
+            case "train2v3":
+                self.trainX2v3 = z
+            case "valid1v2":
+                self.validX1v2 = z
+            case "valid1v3":
+                self.validX1v3 = z
+            case "valid2v3":
+                self.validX2v3 = z
+            case _:
+                raise Exception
         
