@@ -1,0 +1,2 @@
+-Each problem has its own main file
+-For running the solution to problem 2 just use problem2.py as the main file, problem3.py for problem 3, etc.
