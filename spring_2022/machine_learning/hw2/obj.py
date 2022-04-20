@@ -11,10 +11,10 @@ class LogLoss:
 
     def eval(self, y, yhat, input_type):
         epsilon = .0000001
-
+        '''
         if input_type == "1v2" or input_type == "1v3" or input_type == "2v3":
             y, yhat = self.setTempYhat(y, yhat, input_type)
-
+        '''
         J = np.zeros((len(y), 1), dtype = 'float')
         for i in range(len(J)):
             J[i][0] = -1 * ((y[i][0] * np.log((yhat[i][0] + epsilon))) + (1 - y[i][0]) * np.log((1 - yhat[i][0] + epsilon)))
@@ -34,6 +34,7 @@ class LogLoss:
             mean = np.mean(J)
             self.mean2v3.append(mean)
 
+    '''
     def setTempYhat(self, y, yhat, input_type):
         tempYhat = np.array([])
         tempY = np.array([])
@@ -58,3 +59,4 @@ class LogLoss:
         newY = np.reshape(tempYhat, (size, 1))
 
         return newY, newYhat
+        '''

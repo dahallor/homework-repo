@@ -44,7 +44,7 @@ class Run:
             
 
     def multiclassLogisticalRegression(self, logLoss, evaluation, weights, IL):
-        while self.epoch <= 1000:
+        while self.epoch <= 10000:
             #Check Conditionals
             if self.epoch % 100 == 0:
                 print("Epoch: {}\n".format(self.epoch))
@@ -57,36 +57,31 @@ class Run:
                     break
 
             #Get Yhat        
-            trainYhat_1v2 = evaluation.calcMulticlass(IL.trainX, weights, "1v2")
-            weights.set_dJdW(IL.trainX, IL.trainY, trainYhat_1v2)
-            weights.set_dJdb(IL.trainY, trainYhat_1v2)
+            trainYhat_1v2 = evaluation.calcMulticlass(IL.trainX1v2, weights, "1v2")
+            weights.set_dJdW(IL.trainX1v2, IL.trainY1v2, trainYhat_1v2)
+            weights.set_dJdb(IL.trainY1v2, trainYhat_1v2)
             weights.updateWAndBMulticlass(self.eta, "1v2")
-            logLoss.eval(IL.trainY, trainYhat_1v2, "1v2")
+            logLoss.eval(IL.trainY1v2, trainYhat_1v2, "1v2")
 
-            trainYhat_1v3 = evaluation.calcMulticlass(IL.trainX, weights, "1v3")
-            weights.set_dJdW(IL.trainX, IL.trainY, trainYhat_1v3)
-            weights.set_dJdb(IL.trainY, trainYhat_1v3)
+            trainYhat_1v3 = evaluation.calcMulticlass(IL.trainX1v3, weights, "1v3")
+            weights.set_dJdW(IL.trainX1v3, IL.trainY1v3, trainYhat_1v3)
+            weights.set_dJdb(IL.trainY1v3, trainYhat_1v3)
             weights.updateWAndBMulticlass(self.eta, "1v3")
-            logLoss.eval(IL.trainY, trainYhat_1v3, "1v3")
+            logLoss.eval(IL.trainY1v3, trainYhat_1v3, "1v3")
 
-            trainYhat_2v3 = evaluation.calcMulticlass(IL.trainX, weights, "2v3")
-            weights.set_dJdW(IL.trainX, IL.trainY, trainYhat_2v3)
-            weights.set_dJdb(IL.trainY, trainYhat_2v3)
+            trainYhat_2v3 = evaluation.calcMulticlass(IL.trainX2v3, weights, "2v3")
+            weights.set_dJdW(IL.trainX2v3, IL.trainY2v3, trainYhat_2v3)
+            weights.set_dJdb(IL.trainY2v3, trainYhat_2v3)
             weights.updateWAndBMulticlass(self.eta, "2v3")
-            logLoss.eval(IL.trainY, trainYhat_2v3, "2v3")
+            logLoss.eval(IL.trainY2v3, trainYhat_2v3, "2v3")
 
             #Incremenet values
             self.epoch_list.append(self.epoch)
             self.epoch += 1
 
-        '''
         validYhat = evaluation.calcYhatValid(IL.validX, weights)
-        logLoss.eval(IL.validY, validYhat, "valid")
-        print(validYhat)
-        pdb.set_trace()
-        '''
-
-
+        evaluation.setConfusionMatrix(IL.validY, validYhat)
+        
 
 
     def calcStats(self, evaluation, IL, trainYhat, validYhat):

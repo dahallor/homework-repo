@@ -40,8 +40,7 @@ if __name__ == '__main__':
     IL.zScore("valid1v2")
     IL.zScore("valid1v3")
     IL.zScore("valid2v3")
-    pdb.set_trace()
+    #pdb.set_trace()
 
     run.multiclassLogisticalRegression(logLoss, evaluation, weights, IL)
     plot.plotMeanMulticlass(logLoss, run.epoch_list)
-    #plot.plotMean(logLoss, run.epoch_list)

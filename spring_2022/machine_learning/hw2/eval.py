@@ -17,6 +17,7 @@ class Eval():
         self.recall_PR_train = []
         self.prec_PR_valid = []
         self.recall_PR_valid = []
+        self.matrix = np.array([[0, 0, 0,], [0, 0, 0], [0, 0, 0]])
         self.thresholds = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
     def calcProbability(self, X, weights):
@@ -148,5 +149,39 @@ class Eval():
 
         return newYhat
 
+    def setConfusionMatrix(self, Y, Yhat):
+        N = (len(Y))
+        sum = 0
+        for i in range(len(Yhat)):
+            match Y[i][0]:
+                case 1:
+                    if Yhat[i][0] == 1:
+                        self.matrix[0][0] += 1
+                        sum += 1
+                    if Yhat[i][0] == 2:
+                        self.matrix[0][1] += 1
+                    if Yhat[i][0] == 3:
+                        self.matrix[0][2] += 1
+                case 2:
+                    if Yhat[i][0] == 1:
+                        self.matrix[1][0] += 1
+                    if Yhat[i][0] == 2:
+                        self.matrix[1][1] += 1
+                        sum += 1
+                    if Yhat[i][0] == 3:
+                        self.matrix[1][2] += 1
+                case 3:
+                    if Yhat[i][0] == 1:
+                        self.matrix[2][0] += 1
+                    if Yhat[i][0] == 2:
+                        self.matrix[2][1] += 1
+                    if Yhat[i][0] == 3:
+                        self.matrix[2][2] += 1
+                        sum += 1
+                case _:
+                    raise Exception
+        print(self.matrix)
+        acc = (1/N) * sum
+        print("Validation Accuracy: {}%".format(acc*100))
     
 
