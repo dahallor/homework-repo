@@ -9,6 +9,18 @@ class InputLayer:
         self.trainY = 0
         self.validX = 0
         self.validY = 0
+        self.trainX1v2 = np.array([])
+        self.trainY1v2 = np.array([])
+        self.trainX1v3 = np.array([])
+        self.trainY1v3 = np.array([])
+        self.trainX2v3 = np.array([])
+        self.trainY2v3 = np.array([])
+        self.validX1v2 = np.array([])
+        self.validY1v2 = np.array([])
+        self.validX1v3 = np.array([])
+        self.validY1v3 = np.array([])
+        self.validX2v3 = np.array([])
+        self.validY2v3 = np.array([])
 
     def getSpamItems(self):
         data = np.genfromtxt('spambase.data', delimiter = ",")
@@ -60,6 +72,86 @@ class InputLayer:
         self.trainY = Y[:training_size]
         self.validX = X[training_size:]
         self.validY = Y[training_size:]
+
+    def setMulticlassData(self, set):
+        for i in range(len(self.trainX)):
+            match set:
+                case "1v2":
+                    #pdb.set_trace()
+                    if self.trainY[i] == 1:
+                        self.trainX1v2 = np.append(self.trainX1v2, self.trainX[i])
+                        self.trainY1v2 = np.append(self.trainY1v2, 1)
+                    if self.trainY[i] == 2:
+                        self.trainX1v2 = np.append(self.trainX1v2, self.trainX[i])
+                        self.trainY1v2 = np.append(self.trainY1v2, 0)
+                    if i == len(self.trainX) - 1:
+                        size = len(self.trainY1v2)
+                        print(self.trainX1v2)
+                        self.trainX1v2 = np.reshape(self.trainX1v2, (size, len(self.trainX[0])))
+                        self.trainY1v2 = np.reshape(self.trainY1v2, (size, 1))
+                case "1v3":
+                    if self.trainY[i] == 1:
+                        self.trainX1v3 = np.append(self.trainX1v3, self.trainX[i])
+                        self.trainY1v3 = np.append(self.trainY1v3, 1)
+                    if self.trainY[i] == 3:
+                        self.trainX1v3 = np.append(self.trainX1v3, self.trainX[i])
+                        self.trainY1v3 = np.append(self.trainY1v3, 0)
+                    if i == len(self.trainX) - 1:
+                        size = len(self.trainY1v3)
+                        self.trainX1v3 = np.reshape(self.trainX1v3, (size, len(self.trainX[0])))
+                        self.trainY1v3 = np.reshape(self.trainY1v3, (size, 1))
+                case "2v3":
+                    if self.trainY[i] == 2:
+                        self.trainX2v3 = np.append(self.trainX2v3, self.trainX[i])
+                        self.trainY2v3 = np.append(self.trainY2v3, 1)
+                    if self.trainY[i] == 3:
+                        self.trainX2v3 = np.append(self.trainX2v3, self.trainX[i])
+                        self.trainY2v3 = np.append(self.trainY2v3, 0)
+                    if i == len(self.trainX) - 1:
+                        size = len(self.trainY2v3)
+                        self.trainX2v3 = np.reshape(self.trainX2v3, (size, len(self.trainX[0])))
+                        self.trainY2v3 = np.reshape(self.trainY2v3, (size, 1))
+                case _:
+                    raise Exception
+
+        for i in range(len(self.validX)):
+            match set:
+                case "1v2":
+                    if self.validY[i] == 1:
+                        self.validX1v2 = np.append(self.validX1v2, self.validX[i])
+                        self.validY1v2 = np.append(self.validY1v2, 1)
+                    if self.validY[i] == 2:
+                        self.validX1v2 = np.append(self.validX1v2, self.validX[i])
+                        self.validY1v2 = np.append(self.validY1v2, 0)
+                    if i == len(self.validX) - 1:
+                        size = len(self.validY1v2)
+                        self.validX1v2 = np.reshape(self.validX1v2, (size, len(self.validX[0])))
+                        self.validY1v2 = np.reshape(self.validY1v2, (size, 1))
+                case "1v3":
+                    if self.validY[i] == 1:
+                        self.validX1v3 = np.append(self.validX1v3, self.validX[i])
+                        self.validY1v3 = np.append(self.validY1v3, 1)
+                    if self.validY[i] == 3:
+                        self.validX1v3 = np.append(self.validX1v3, self.validX[i])
+                        self.validY1v3 = np.append(self.validY1v3, 0)
+                    if i == len(self.validX) - 1:
+                        size = len(self.validY1v3)
+                        self.validX1v3 = np.reshape(self.validX1v3, (size, len(self.validX[0])))
+                        self.validY1v3 = np.reshape(self.validY1v3, (size, 1))
+                case "2v3":
+                    if self.validY[i] == 2:
+                        self.validX2v3 = np.append(self.validX2v3, self.validX[i])
+                        self.validY2v3 = np.append(self.validY2v3, 1)
+                    if self.validY[i] == 3:
+                        self.validX2v3 = np.append(self.validX2v3, self.validX[i])
+                        self.validY2v3 = np.append(self.validY2v3, 0)
+                    if i == len(self.validX) - 1:
+                        size = len(self.validY2v3)
+                        self.validX2v3 = np.reshape(self.validX2v3, (size, len(self.validX[0])))
+                        self.validY2v3 = np.reshape(self.validY2v3, (size, 1))
+                case _:
+                    raise Exception
+
 
     def setMeanAndSTD(self, data):
         self.mean = np.mean(data, axis = 0)

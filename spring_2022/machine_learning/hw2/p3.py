@@ -22,8 +22,13 @@ if __name__ == '__main__':
     data = IL.getIrisItems()
     data = IL.shuffleData(data, 0)
     IL.splitDataSpam(data)
+
+    IL.setMulticlassData("1v2")
+    IL.setMulticlassData("1v3")
+    IL.setMulticlassData("2v3")
+
     weights = Weights(IL.trainX)
-    #pdb.set_trace()
+    pdb.set_trace()
 
 
     IL.setMeanAndSTD(IL.trainX)
