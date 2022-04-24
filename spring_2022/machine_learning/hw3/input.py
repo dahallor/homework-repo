@@ -4,6 +4,8 @@ class InputLayer:
     def __init__(self):
         self.mean = 0
         self.std = 0
+        self.var = 0
+
         self.trainX = 0
         self.trainY = 0
         self.validX = 0
@@ -38,9 +40,10 @@ class InputLayer:
         self.validX = X[training_size:]
         self.validY = Y[training_size:]
 
-    def setMeanAndSTD(self, data):
+    def setStatsInfo(self, data):
         self.mean = np.mean(data, axis = 0)
         self.std = np.std(data, axis = 0)
+        self.var = np.var(data, axis = 0)
         
     def zScore(self, inputType):
         z = np.array([])
