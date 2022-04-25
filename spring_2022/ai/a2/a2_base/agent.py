@@ -40,27 +40,25 @@ class Agent(Node):
 
         while len(self.open) > 0:
             possible_actions = state.actions()
-            clone = state.clone()
-            for i in range(len(possible_actions)):
-                selected_action = possible_actions[i]
-                stored_x = selected_action.x
-                stored_y = selected_action.y
-                stored_x2 = selected_action.x2
-                stored_y2 = selected_action.y2
-                
-                state.execute(selected_action)
-                result = state.__str__()
-                if result != self.closed:
-                    node = self.createNode(result, selected_action)
-                    self.open.append(node)
-                Action(stored_x, stored_y, stored_x2, stored_y2)
+            if parameter == "BFS":
+                clone = state.clone()
+                for i in range(len(possible_actions)):
+                    reset_state = State(str(clone))
+                    selected_action = possible_actions[i]
+                    '''
+                    stored_x = selected_action.x
+                    stored_y = selected_action.y
+                    stored_x2 = selected_action.x2
+                    stored_y2 = selected_action.y2
+                    '''
+                    result = reset_state.execute(selected_action).__str__()
+                    if result not in self.closed:
+                        node = self.createNode(result, selected_action)
+                        self.open.append(node)
+                    #Action(stored_x2, stored_y2, stored_x, stored_y)
+                    
 
-                pdb.set_trace()
-
-
-
-
-            pass
+                    pdb.set_trace()
 
 
 
@@ -74,13 +72,14 @@ class Agent(Node):
         pass
 
     def random_walk(self, state, n):
+        results = []
         for i in range(n):
             actions = state.actions()
             options = len(actions)
             selection = random.randint(0, options-1)
             selected_action = actions[selection]
             result = state.execute(selected_action)
-            util.pprint(result)
-            #print(state.__str__())
+            results.append(state.clone())
+        util.pprint(results)
 
         
