@@ -20,7 +20,9 @@ if __name__ == '__main__':
         case 'random':
             agent.random_walk(state, n)
         case "bfs":
-            agent.BFS(state)
+            agent._search(state, "BFS")
+        case "dfs":
+            agent._search(state, "DFS")
         case _:
-            raise Exception
+            raise Exception("Command not recognized")
 

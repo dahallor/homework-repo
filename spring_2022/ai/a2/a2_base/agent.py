@@ -7,23 +7,39 @@ class Node:
     def __init__(self):
         self.open = []
         self.closed = []
-        self.queue = []
+        self.id = 1
+        self.parent_id = self.id
 
-    def createNode(self, value, pointer):
-        node = [value, pointer]
+    def createNode(self, id, value, pointer):
+        node = [id, value, pointer]
         return node
 
     def addToFront(self, node):
-        self.queue.insert(0, node)
+        self.open.insert(0, node)
 
     def addToBack(self, node):
-        self.queue.append(node)
+        self.open.append(node)
 
     def deleteFromFront(self):
-        self.queue.pop(0)
+        node = self.open[0]
+        self.open.pop(0)
+        self.closed.insert(0, node)
 
     def deleteFromBack(self):
-        self.queue.pop(-1)
+        node = self.open[-1]
+        self.open.pop(-1)
+        self.closed.append(node)
+
+    def getFromOpenFront(self):
+        node = self.open[0]
+        state = node[1]
+        return state
+
+    def getFromOpenBack(self):
+        node = self.open[-1]
+        state = node[1]
+        return state
+
 
 
 
@@ -34,39 +50,78 @@ class Agent(Node):
         super().__init__()
 
     def _search(self, state, parameter):
+        #Initialize values
         value = state.__str__()
-        node = self.createNode(value, None)
+        node = self.createNode(self.id, value, None)
         self.open.append(node)
+        possible_actions = state.actions()
+        clone = state.clone()
 
+        #Search Algorithm
+
+        i = 0
         while len(self.open) > 0:
-            possible_actions = state.actions()
+            i += 1
             if parameter == "BFS":
-                clone = state.clone()
-                for i in range(len(possible_actions)):
-                    reset_state = State(str(clone))
-                    selected_action = possible_actions[i]
-                    '''
-                    stored_x = selected_action.x
-                    stored_y = selected_action.y
-                    stored_x2 = selected_action.x2
-                    stored_y2 = selected_action.y2
-                    '''
-                    result = reset_state.execute(selected_action).__str__()
-                    if result not in self.closed:
-                        node = self.createNode(result, selected_action)
-                        self.open.append(node)
-                    #Action(stored_x2, stored_y2, stored_x, stored_y)
-                    
+                self.BFS(possible_actions, clone)
+                string = self.getFromOpenFront()
+                self.parent_id = self.open[0][0]
+            if parameter == "DFS":
+                self.DFS(possible_actions, clone)
+                string = self.getFromOpenBack()
+                self.parent_id = self.open[-1][0]
 
-                    pdb.set_trace()
+            
+            
+            clone = State(string)
+            possible_actions = clone.actions()
+            if i % 1000 == 0:
+                print(i)
 
 
 
-    def BFS(self, state):
-        self._search(state, "BFS")
 
-    def DFS (self, state):
-        pass
+    def BFS(self, possible_actions, clone):
+        self.deleteFromFront()
+        for i in range(len(possible_actions)):
+            reset_state = State(str(clone))
+            selected_action = possible_actions[i]
+            result = reset_state.execute(selected_action).__str__()
+            repeat = False
+            for j in range(len(self.closed)):
+                if result == self.closed[j][1]:
+                    repeat = True
+                    break
+            for j in range(len(self.open)):
+                if result == self.open[j][1]:
+                    repeat = True
+                    break
+            if repeat == False:
+                self.id += 1
+                node = self.createNode(self.id, result, self.parent_id)
+                self.addToBack(node)
+
+
+    def DFS (self, possible_actions, clone):
+        self.deleteFromBack()
+        for i in range(len(possible_actions)):
+            reset_state = State(str(clone))
+            selected_action = possible_actions[i]
+            result = reset_state.execute(selected_action).__str__()
+            repeat = False
+            for j in range(len(self.closed)):
+                if result == self.closed[j][1]:
+                    repeat = True
+                    break
+            for j in range(len(self.open)):
+                if result == self.open[j][1]:
+                    repeat = True
+                    break
+            if repeat == False:
+                self.id += 1
+                node = self.createNode(self.id, result, self.parent_id)
+                self.addToBack(node)
+        pdb.set_trace()
 
     def astar(self, state, h):
         pass
