@@ -5,10 +5,12 @@ from rgb import *
 
 class Node:
     def __init__(self):
+        self.currentPathNodes = []
+        self.currentPathStatesOnly = []
         self.open = []
         self.closed = []
         self.id = 1
-        self.parent_id = self.id
+        self.parent_id = 0
 
     def createNode(self, id, value, pointer):
         node = [id, value, pointer]
@@ -127,14 +129,25 @@ class Agent(Node):
         pass
 
     def random_walk(self, state, n):
-        results = []
-        for i in range(n):
+        node = self.createNode(self.id, state.clone(), None)
+        self.currentPathNodes.append(node)
+        #pdb.set_trace()
+        for i in range(n-1):
+            self.id += 1
+            self.parent_id += 1
             actions = state.actions()
             options = len(actions)
             selection = random.randint(0, options-1)
             selected_action = actions[selection]
             result = state.execute(selected_action)
-            results.append(state.clone())
-        util.pprint(results)
+            node = self.createNode(self.id, state.clone(), self.parent_id)
+            self.currentPathNodes.append(node)
+            #pdb.set_trace()
+            #results.append(state.clone())
+        #pdb.set_trace()
+        for i in range(len(self.currentPathNodes)):
+            self.currentPathStatesOnly.append(self.currentPathNodes[i][1])
+            print(i)
+        util.pprint(self.currentPathStatesOnly)
 
         
