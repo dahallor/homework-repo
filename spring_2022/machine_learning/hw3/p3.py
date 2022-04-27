@@ -11,5 +11,5 @@ if __name__ == '__main__':
 
     prep_data_p3(IL)
     tree.setHash(IL)
-    tree.fillHashData(IL)
-    print(tree.featureHash)
+    tree.fillHashData(IL, "binary")
+    #print(tree.featureHash)
