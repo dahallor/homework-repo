@@ -7,10 +7,19 @@ def prep_data_p2(IL):
     IL.setStatsInfo(IL.trainX)
     IL.zScore("train")
     IL.zScore("valid")
-    seperateTypes(IL)
+    seperateTypesp2(IL)
+
+def prep_data_p3(IL):
+    data = IL.getSpamItems()
+    data = IL.shuffleData(data, 0)
+    IL.splitDataSpam(data)
+    IL.setStatsInfo(IL.trainX)
+    IL.zScore("train")
+    IL.zScore("valid")
 
 
-def seperateTypes(IL):
+
+def seperateTypesp2(IL):
     for i in range(len(IL.trainX)):
         match IL.trainY[i][0]:
             case 0:
