@@ -5,6 +5,7 @@ class InputLayer:
         self.mean = 0
         self.std = 0
         self.var = 0
+        self.median = 0
 
         self.trainX = 0
         self.trainY = 0
@@ -69,4 +70,9 @@ class InputLayer:
                 self.validX = z
             case _:
                 raise Exception
+
+    def setZscoredMedian(self):
+        self.median = np.median(self.trainX, axis = 0)
+
+
 

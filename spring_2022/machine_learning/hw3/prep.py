@@ -16,6 +16,7 @@ def prep_data_p3(IL):
     IL.setStatsInfo(IL.trainX)
     IL.zScore("train")
     IL.zScore("valid")
+    IL.setZscoredMedian()
 
 
 
