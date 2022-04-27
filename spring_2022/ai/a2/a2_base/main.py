@@ -1,6 +1,6 @@
+from agent import *
 from rgb import *
 from util import *
-from agent import *
 import sys
 
 
@@ -12,7 +12,9 @@ if __name__ == '__main__':
     
     state_string = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_STATE
     state = State(state_string)
+    node = Node()
     agent = Agent()
+    aux = AuxMethods()
     #action = Action(None, None, None, None)
     n = 8
 
@@ -20,9 +22,9 @@ if __name__ == '__main__':
         case 'random':
             agent.random_walk(state, n)
         case "bfs":
-            agent._search(state, "BFS")
+            agent._search(state, "BFS", node, aux)
         case "dfs":
-            agent._search(state, "DFS")
+            agent._search(state, "DFS", node, aux)
         case _:
             raise Exception("Command not recognized")
 

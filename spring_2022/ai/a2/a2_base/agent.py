@@ -1,10 +1,12 @@
 import random
 import util
 import pdb
+import sys
 from rgb import *
 
 class Node:
     def __init__(self):
+        self.currentPath = []
         self.currentPathNodes = []
         self.currentPathStatesOnly = []
         self.open = []
@@ -51,90 +53,56 @@ class Node:
 
 
 
-class Agent(Node):
-    def __init__(self):
-        super().__init__()
+class Agent:
 
-    def _search(self, state, parameter):
+    def _search(self, state, parameter, node, aux):
         #Initialize values
-        node = self.createNode(self.id, state.clone(), None)
-        self.open.append(node)
-        #self.currentPathNodes.append(node)
-        possible_actions = state.actions()
-        clone = state.clone()
+        currentNode,  possible_actions, clone = aux.initalizeSearch(node, state)
+        aux.addToCurrentPath(node, currentNode[1])
 
         #Search Algorithm
 
-        i = 0
-        while len(self.open) > 0:
-            i += 1
-            '''
-            if i > 2:
-                pdb.set_trace()
-                self.currentPathNodes.pop(-1)
-                '''
-            currentNode = self.open[0]
-            self.currentPathNodes.append(currentNode)
-            self.deleteFromFront()
+        tally = 0
+        while len(node.open) > 0:
+            currentNode = aux.initalizeLoop(node)
             for i in range(len(possible_actions)):
-                reset_state = State(str(clone))
-                #pdb.set_trace()
-                selected_action = possible_actions[i]
-                result = reset_state.execute(selected_action)
-                result_string = result.__str__()
-                #pdb.set_trace()
-                repeat = False
-                num_paths = 0
-                for j in range(len(self.closed)):
-                    if result_string == self.closed[j][1]:
-                        repeat = True
-                        break
-                if repeat == False:
-                    num_paths += 1
-                    self.id += 1
-                    if parameter == "BFS":
-                        string = self.BFS(result, currentNode)
-                    if parameter == "DFS":
-                        string = self.DFS(result, currentNode)
-                    
-                    self.printStatesFromCurrentPath()
-                    #pdb.set_trace()
-                    self.currentPathNodes.pop(-1)
-                if num_paths == 0:
-                    self.currentPathNodes.pop(-1)
+                result_string, tally, result = aux.evalCurrentNode(tally, clone, possible_actions, i)
+                repeat = aux.checkForRepeats(result_string, node)
+                aux.selectSearchMethod(self, repeat, node, parameter, result, currentNode)
+                aux.checkIfGoal(result_string, tally)
+
+                State(result_string)
                 
             
-            clone = State(string)
+            #clone = State(string)
             possible_actions = clone.actions()
-            pdb.set_trace()
-
-
-            if state.is_goal == True:
-                print(i)
-                break
 
 
 
 
-    def BFS(self, result, currentNode):
-        self.parent_id = currentNode[0]
-        node = self.createNode(self.id, result, self.parent_id)
-        self.currentPathNodes.append(node)
-        self.addToBack(node)
-        string = self.getFromOpenFront().__str__()
+
+
+    def BFS(self, result, currentNode, node):
+        node.parent_id = currentNode[0]
+        currentNode = node.createNode(node.id, result, node.parent_id)
+        node.addToBack(currentNode)
+        '''
+        string = node.getFromOpenFront().__str__()
         
         return string
+        '''
 
 
 
-    def DFS(self, result, currentNode):
-        self.parent_id = currentNode[0]
-        node = self.createNode(self.id, result, self.parent_id)
-        self.currentPathNodes.append(node)
-        self.addToFront(node)
-        string = self.getFromOpenFront().__str__()
+    def DFS(self, result, currentNode, node):
+        node.parent_id = currentNode[0]
+        currentNode = node.createNode(node.id, result, node.parent_id)
+        node.addToFront(currentNode)
+        '''
+        string = node.getFromOpenFront().__str__()
 
         return string
+        '''
 
 
     def astar(self, state, h):
@@ -156,5 +124,64 @@ class Agent(Node):
             self.currentPathNodes.append(node)
         self.printStatesFromCurrentPath()
 
+class AuxMethods:
+    def evalCurrentNode(self, tally, clone, possible_actions, i):
+        tally += 1
+        reset_state = State(str(clone))
+        #pdb.set_trace()
+        selected_action = possible_actions[i]
+        result = reset_state.execute(selected_action)
+        result_string = result.__str__()
 
-        
+        return result_string, tally, result
+
+    def initalizeSearch(self, node, state):
+        currentNode = node.createNode(node.id, state.clone(), None)
+        node.open.append(currentNode)
+        possible_actions = state.actions()
+        clone = state.clone()
+        return currentNode,  possible_actions, clone
+
+    def initalizeLoop(self, node):
+        currentNode = node.open[0]
+        #node.currentPathNodes.append(currentNode)
+        node.deleteFromFront()
+        return currentNode
+
+    def checkForRepeats(self, result_string, node):
+        repeat = False
+        for j in range(len(node.closed)):
+            if result_string == node.closed[j][1]:
+                repeat = True
+                break
+        return repeat
+    
+    def selectSearchMethod(self, agent, repeat, node, parameter, result, currentNode):
+        if repeat == False:
+            node.id += 1
+            if parameter == "BFS":
+                agent.BFS(result, currentNode, node)
+            if parameter == "DFS":
+                agent.DFS(result, currentNode, node)
+            
+            node.printStatesFromCurrentPath()
+            pdb.set_trace()
+            self.addToCurrentPath(node, result)
+            self.printCurrentPath(node)
+
+    def checkIfGoal(self, string, tally):
+        check = State(string)
+        #pdb.set_trace()
+        if check.is_goal() == True:
+            print(tally)
+            sys.exit()
+
+    def addToCurrentPath(self, node, result):
+        #pdb.set_trace()
+        node.currentPath.append(result)
+
+    def removeFromCurrentPath(self):
+        pass
+
+    def printCurrentPath(self, node):
+        util.pprint(node.currentPath)
