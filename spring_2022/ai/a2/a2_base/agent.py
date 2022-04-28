@@ -53,29 +53,39 @@ class Node:
 
 
 
+
+#--------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
 class Agent:
 
+
+#--------------------------------------Search-------------------------------------------------------------------
     def _search(self, state, parameter, node, aux):
-        #Initialize values
-        currentNode,  possible_actions, clone = aux.initalizeSearch(node, state)
-        aux.addToCurrentPath(node, currentNode[1])
+        currentNode,  possible_actions, clone, tally = aux.initalizeSearch(node, state)
+        aux.printCurrentPath(node, currentNode)
 
-        #Search Algorithm
-
-        tally = 0
         while len(node.open) > 0:
             currentNode = aux.initalizeLoop(node)
+            if tally > 1:
+                clone = State(currentNode[1].__str__())
+                possible_actions = clone.actions()
             for i in range(len(possible_actions)):
                 result_string, tally, result = aux.evalCurrentNode(tally, clone, possible_actions, i)
                 repeat = aux.checkForRepeats(result_string, node)
-                aux.selectSearchMethod(self, repeat, node, parameter, result, currentNode)
+                childNode = aux.selectSearchMethod(self, repeat, node, parameter, result, currentNode)
+                #aux.printCurrentPath(node, childNode)
                 aux.checkIfGoal(result_string, tally)
 
-                State(result_string)
                 
             
-            #clone = State(string)
-            possible_actions = clone.actions()
+
+            #pdb.set_trace()
 
 
 
@@ -84,45 +94,52 @@ class Agent:
 
     def BFS(self, result, currentNode, node):
         node.parent_id = currentNode[0]
-        currentNode = node.createNode(node.id, result, node.parent_id)
-        node.addToBack(currentNode)
-        '''
-        string = node.getFromOpenFront().__str__()
+        childNode = node.createNode(node.id, result, node.parent_id)
+        node.addToBack(childNode)
+        return childNode
+
         
-        return string
-        '''
 
 
 
     def DFS(self, result, currentNode, node):
         node.parent_id = currentNode[0]
-        currentNode = node.createNode(node.id, result, node.parent_id)
-        node.addToFront(currentNode)
-        '''
-        string = node.getFromOpenFront().__str__()
-
-        return string
-        '''
+        childNode = node.createNode(node.id, result, node.parent_id)
+        node.addToFront(childNode)
+        return childNode
 
 
-    def astar(self, state, h):
+    def astar(self, state, h, node):
         pass
 
+#-------------------------------random walk-------------------------------------------------------------------------
+
     def random_walk(self, state, n):
-        node = self.createNode(self.id, state.clone(), None)
-        self.currentPathNodes.append(node)
+        currentNode = self.createNode(node.id, state.clone(), None)
+        node.currentPathNodes.append(currentNode)
         #pdb.set_trace()
         for i in range(n-1):
-            self.id += 1
-            self.parent_id += 1
+            node.id += 1
+            node.parent_id += 1
             actions = state.actions()
             options = len(actions)
             selection = random.randint(0, options-1)
             selected_action = actions[selection]
             result = state.execute(selected_action)
-            node = self.createNode(self.id, state.clone(), self.parent_id)
-            self.currentPathNodes.append(node)
-        self.printStatesFromCurrentPath()
+            node = node.createNode(node.id, state.clone(), node.parent_id)
+            node.currentPathNodes.append(node)
+        node.printStatesFromCurrentPath()
+
+
+
+
+
+#-------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
 
 class AuxMethods:
     def evalCurrentNode(self, tally, clone, possible_actions, i):
@@ -140,11 +157,11 @@ class AuxMethods:
         node.open.append(currentNode)
         possible_actions = state.actions()
         clone = state.clone()
-        return currentNode,  possible_actions, clone
+        tally = 0
+        return currentNode,  possible_actions, clone, tally
 
     def initalizeLoop(self, node):
         currentNode = node.open[0]
-        #node.currentPathNodes.append(currentNode)
         node.deleteFromFront()
         return currentNode
 
@@ -160,14 +177,11 @@ class AuxMethods:
         if repeat == False:
             node.id += 1
             if parameter == "BFS":
-                agent.BFS(result, currentNode, node)
+                childNode = agent.BFS(result, currentNode, node)
             if parameter == "DFS":
-                agent.DFS(result, currentNode, node)
+                childNode = agent.DFS(result, currentNode, node)
             
-            node.printStatesFromCurrentPath()
-            pdb.set_trace()
-            self.addToCurrentPath(node, result)
-            self.printCurrentPath(node)
+            self.printCurrentPath(node, childNode)
 
     def checkIfGoal(self, string, tally):
         check = State(string)
@@ -176,12 +190,16 @@ class AuxMethods:
             print(tally)
             sys.exit()
 
-    def addToCurrentPath(self, node, result):
-        #pdb.set_trace()
-        node.currentPath.append(result)
 
-    def removeFromCurrentPath(self):
-        pass
-
-    def printCurrentPath(self, node):
+    def printCurrentPath(self, node, childNode):
+        node.currentPath = []
+        parent = childNode[-1]
+        node.currentPath.insert(0, childNode[1])
+        while parent != None:
+            for i in range(len(node.closed)):
+                if parent == node.closed[i][0]:
+                    parentNode = node.closed[i]
+                    parent = parentNode[-1]
+                    node.currentPath.insert(0, parentNode[1])
+                #pdb.set_trace()
         util.pprint(node.currentPath)
