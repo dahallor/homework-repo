@@ -70,7 +70,7 @@ class Agent:
         currentNode,  possible_actions, clone, tally = aux.initalizeSearch(node, state)
         aux.printCurrentPath(node, currentNode)
 
-        while len(node.open) > 0:
+        while len(node.open) > 0 :
             currentNode = aux.initalizeLoop(node)
             if tally > 1:
                 clone = State(currentNode[1].__str__())
@@ -79,8 +79,11 @@ class Agent:
                 result_string, tally, result = aux.evalCurrentNode(tally, clone, possible_actions, i)
                 repeat = aux.checkForRepeats(result_string, node)
                 childNode = aux.selectSearchMethod(self, repeat, node, parameter, result, currentNode)
-                #aux.printCurrentPath(node, childNode)
                 aux.checkIfGoal(result_string, tally)
+            if parameter == "DFS" and repeat == False:
+                aux.printCurrentPath(node, childNode)
+            #print(currentNode)
+            #pdb.set_trace()
 
                 
             
@@ -178,10 +181,13 @@ class AuxMethods:
             node.id += 1
             if parameter == "BFS":
                 childNode = agent.BFS(result, currentNode, node)
+                self.printCurrentPath(node, childNode)
+
             if parameter == "DFS":
                 childNode = agent.DFS(result, currentNode, node)
+           
             
-            self.printCurrentPath(node, childNode)
+            return childNode
 
     def checkIfGoal(self, string, tally):
         check = State(string)
@@ -201,5 +207,5 @@ class AuxMethods:
                     parentNode = node.closed[i]
                     parent = parentNode[-1]
                     node.currentPath.insert(0, parentNode[1])
-                #pdb.set_trace()
+            #pdb.set_trace()
         util.pprint(node.currentPath)
