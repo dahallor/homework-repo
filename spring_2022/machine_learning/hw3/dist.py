@@ -3,21 +3,15 @@ import math
 import pdb
 
 class Normals:
-    def setNormals(self, IL):
-        #trainX0
-        prob = []
-        for i in range(len(IL.trainX0)):
-            temp = []
-            for j in range(len(IL.trainX0[i])):
-                x = IL.trainX0[i][j]
-                mu = IL.mean[j]
-                var = IL.var[j]
-                std = IL.std[j]
+    def __init__(self):
+        self.mean_not_spam = 0
+        self.std_not_spam = 0
+        self.mean_spam = 0
+        self.std_spam = 0
 
-                exponent = -1 * ((math.pow((x - mu), 2))/(2 * var))
-                e = np.exp(exponent)
-                p = 1/(std * np.sqrt((2 * math.pi))) * e
-                temp.append(p)
-                
-            prob.append(temp)
-            pdb.set_trace()
+    def setStatsp2(self, trainX0, trainX1):
+        self.mean_not_spam = np.mean(trainX0, axis=0)
+        self.std_not_spam = np.std(trainX0, axis=0)
+        self.mean_spam = np.mean(trainX1, axis=0)
+        self.std_spam = np.std(trainX1, axis=0)
+

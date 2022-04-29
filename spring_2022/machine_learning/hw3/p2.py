@@ -11,6 +11,6 @@ if __name__ == '__main__':
 
     prep_data_p2(IL)
 
-    normals.setNormals(IL)
+    normals.setStatsp2(IL.trainX0, IL.trainX1)
 
-    #pdb.set_trace()
+    pdb.set_trace()
