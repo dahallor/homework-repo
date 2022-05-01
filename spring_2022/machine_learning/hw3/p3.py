@@ -11,8 +11,10 @@ if __name__ == '__main__':
     tree_train = Tree(IL.trainX)
     tree_valid = Tree(IL.validX)
 
+    
     tree_train.setHash(IL)
     tree_train.fillHashData(IL, "binary")
-    tree_train.calcEntropy()
+    tree_train.calcEntropy(2)
     print(tree_train.getRoot())
+    pdb.set_trace()
     #print(tree_train.featureHash)

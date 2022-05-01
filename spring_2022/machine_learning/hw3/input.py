@@ -18,6 +18,9 @@ class InputLayer:
         self.trainY0 = np.array([])
         self.trainY1 = np.array([])
 
+        self.debugX = np.array([])
+        self.debugY = np.array([])
+
     def getSpamItems(self):
             data = np.genfromtxt('spambase.data', delimiter = ",")
             return data
@@ -41,6 +44,10 @@ class InputLayer:
         self.validX = X[training_size:]
         self.validY = Y[training_size:]
 
+        self.debugX = np.arange(70)
+        self.debugX.reshape(7,10)
+        self.debugY = np.array([[1], [0], [0], [1], [0], [0], [1], [0], [1], [1]])
+
     def setStatsInfo(self, data):
         self.mean = np.mean(data, axis = 0)
         self.std = np.std(data, axis = 0)
@@ -53,6 +60,8 @@ class InputLayer:
                 data = self.trainX
             case "valid":
                 data = self.validX
+            case "debug":
+                data = self.debugX
             case _:
                 raise Exception
 
@@ -68,6 +77,8 @@ class InputLayer:
                 self.trainX = z
             case "valid":
                 self.validX = z
+            case "debug":
+                self.debugX = z
             case _:
                 raise Exception
 

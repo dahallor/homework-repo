@@ -1,42 +1,49 @@
 import pdb
 import numpy as np
 
+
+
+
 class Tree:
     def __init__(self, data):
         self.featureHash = {}
+        self.obsList = []
+        self.entropy = []
         self.epsilon = .0000001
         self.total = len(data)
 
     def setHash(self, IL):
         for i in range(len(IL.trainX[0])):
             var = self.setVarName(i)
-            self.featureHash[var] = {"below mean" : [0, 0], "above mean": [0, 0], "entropy" : 0}
+            self.featureHash[var] = {"below avg" : [0, 0], "above avg": [0, 0], "entropy" : 0}
         
 
     def fillHashData(self, IL, type):
         for i in range(len(IL.trainX)):
+            observation = {}
+            answer = int(IL.trainY[i][0])
+            observation["class"] = answer
             for j in range(len(IL.trainX[i])):
                 var = self.setVarName(j)
-                answer = IL.trainY[i]
                 feature_num = IL.trainX[i][j]
-                #if feature_num < IL.median[j]:
                 if feature_num < IL.mean[j]:
-                    feature = "below mean"
+                    #IL.trainX[i][j] = "below avg"
+                    feature = "below avg"
                 else:
-                    feature = "above mean"
-                #hash = self.featureHash[var]
-                #print(var, answer, feature, hash)
+                    #IL.trainX[i][j] = "above avg"
+                    feature = "above avg"
+                observation[var] = feature
                 if type == "binary":
-                    #pdb.set_trace()
                     self.setBinaryHash(var, answer, feature)
+            self.obsList.append(observation)
 
-    def calcEntropy(self):
+    def calcEntropy(self, k):
         for i in range(len(self.featureHash)):
             var = self.setVarName(i)
-            b0 = self.featureHash[var]["below mean"][0]
-            b1 = self.featureHash[var]["below mean"][1]
-            a0 = self.featureHash[var]["above mean"][0]
-            a1 = self.featureHash[var]["above mean"][1]
+            b0 = self.featureHash[var]["below avg"][0]
+            b1 = self.featureHash[var]["below avg"][1]
+            a0 = self.featureHash[var]["above avg"][0]
+            a1 = self.featureHash[var]["above avg"][1]
             below_count = b0 + b1
             above_count = a0 + a1
 
@@ -59,6 +66,7 @@ class Tree:
             entropy = (below_count/self.total) * (prob_b0 + prob_b1) + (above_count/self.total) * (prob_a0 + prob_a1)
             self.featureHash[var]["entropy"] = entropy
 
+
     def getRoot(self):
         lowest = 1
         name = ""
@@ -70,11 +78,6 @@ class Tree:
         return name, lowest
 
 
-    
-
-
-
-
     def setVarName(self, num):
         var = "x" + str(num + 1)
         return var
@@ -82,8 +85,6 @@ class Tree:
 
 
     def setBinaryHash(self, var, answer, feature):
-        #format is list[0]: Y = 0 list[1]: Y = 1
-        #pdb.set_trace()
         match answer:
             case 0:
                 arr = self.featureHash[var][feature]
@@ -94,4 +95,12 @@ class Tree:
 
 
 
+class Node(Tree):
+    def __init__(self):
+        super().__init__()
+        self.id = 1
+        node = {}
 
+    
+
+    
