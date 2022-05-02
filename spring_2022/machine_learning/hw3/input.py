@@ -26,6 +26,13 @@ class InputLayer:
     def getSpamItems(self):
             data = np.genfromtxt('spambase.data', delimiter = ",")
             return data
+    
+    def getCartData(self):
+            data = np.genfromtxt('CTG.csv', delimiter = ",")
+            data = np.delete(data, 0, axis = 0)
+            data = np.delete(data, 0, axis = 0)
+            data = np.delete(data, -2, axis = 1)
+            return data
 
     def shuffleData(self, data, num):
         np.random.seed(num)

@@ -1,4 +1,5 @@
 import numpy as np
+import pdb
 
 def prep_data_p2(IL):
     data = IL.getSpamItems()
@@ -18,7 +19,13 @@ def prep_data_p3(IL):
     IL.zScore("valid")
     IL.setZscoredMedian()
 
-
+def prep_data_p4(IL):
+    data = IL.getCartData()
+    data = IL.shuffleData(data, 0)
+    IL.splitDataSpam(data)
+    IL.setStatsInfo(IL.trainX)
+    IL.zScore("train")
+    IL.zScore("valid")
 
 def seperateTypesp2(IL):
     for i in range(len(IL.trainX)):
