@@ -33,6 +33,9 @@ class Node:
         self.open.pop(0)
         self.closed.insert(0, node)
 
+    def deleterFromFrontAStar(self):
+        pass
+
     def deleteFromBack(self):
         node = self.open[-1]
         self.open.pop(-1)
@@ -40,7 +43,7 @@ class Node:
 
     def printStatesFromCurrentPath(self):
         self.currentPathStatesOnly = []
-        #pdb.set_trace()
+        
         for i in range(len(self.currentPathNodes)):
             self.currentPathStatesOnly.append(self.currentPathNodes[i][1])
         util.pprint(self.currentPathStatesOnly)
@@ -71,11 +74,16 @@ class Agent:
 
 #--------------------------------------Search-------------------------------------------------------------------
     def _search(self, state, parameter, node, aux):
-        currentNode,  possible_actions, clone, tally = aux.initalizeSearch(node, state)
+        currentNode,  possible_actions, clone, tally = aux.initalizeSearch(node, state, parameter)
         aux.printCurrentPath(node, currentNode)
 
         while len(node.open) > 0 :
-            currentNode = aux.initalizeLoop(node)
+            if parameter != "A*":
+                currentNode = aux.initalizeLoop(node)
+            if parameter == "A*":
+                currentNode = aux.findNext(node)
+                aux.initalizeLoopAStar(node, currentNode)
+            
             if tally > 1:
                 clone = State(currentNode[1].__str__())
                 possible_actions = clone.actions()
@@ -86,8 +94,7 @@ class Agent:
                 aux.checkIfGoal(result_string, tally)
             if parameter == "DFS" and repeat == False:
                 aux.printCurrentPath(node, childNode)
-            if parameter == "A*" and repeat == False:
-                aux.reorderOpen(node)
+
 
 
     def BFS(self, result, currentNode, node):
@@ -124,7 +131,7 @@ class Agent:
             result = state.execute(selected_action)
             currentNode = node.createNode(node.id, state.clone(), node.parent_id)
             node.currentPathNodes.append(currentNode)
-            #pdb.set_trace()
+            
         node.printStatesFromCurrentPath()
 
 
@@ -142,15 +149,19 @@ class AuxMethods:
     def evalCurrentNode(self, tally, clone, possible_actions, i):
         tally += 1
         reset_state = State(str(clone))
-        #pdb.set_trace()
+        
         selected_action = possible_actions[i]
         result = reset_state.execute(selected_action)
         result_string = result.__str__()
 
         return result_string, tally, result
 
-    def initalizeSearch(self, node, state):
-        currentNode = node.createNode(node.id, state.clone(), None)
+    def initalizeSearch(self, node, state, parameter):
+        if parameter != "A*":
+            currentNode = node.createNode(node.id, state.clone(), None)
+        if parameter == "A*":
+            h = self.heuristic(node, state.clone())
+            currentNode = node.createAStarNode(node.id, state.clone(), h, None)
         node.open.append(currentNode)
         possible_actions = state.actions()
         clone = state.clone()
@@ -162,14 +173,20 @@ class AuxMethods:
         node.deleteFromFront()
         return currentNode
 
+    def initalizeLoopAStar(self, node, currentNode):
+        for i in range(len(node.open)):
+            if node.open[i] == currentNode:
+                
+                node.open.pop(i)
+                node.closed.insert(0, currentNode)
+                break
+
     def checkForRepeats(self, result_string, node):
         repeat = False
         for j in range(len(node.closed)):
             if result_string == node.closed[j][1]:
                 repeat = True
                 break
-        print(repeat)
-        #pdb.set_trace()
         return repeat
     
     def selectSearchMethod(self, agent, repeat, node, parameter, result, currentNode):
@@ -184,9 +201,9 @@ class AuxMethods:
 
             if parameter == "A*":
                 h = self.heuristic(node, result)
-                #pdb.set_trace()
+                
                 childNode = agent.astar(result, currentNode, h, node)
-                #pdb.set_trace()
+                
                 self.printCurrentPath(node, childNode)
            
             
@@ -194,10 +211,9 @@ class AuxMethods:
 
     def checkIfGoal(self, string, tally):
         check = State(string)
-        #pdb.set_trace()
+        
         if check.is_goal() == True:
             print(tally)
-            pdb.set_trace()
             sys.exit()
 
 
@@ -205,16 +221,17 @@ class AuxMethods:
         node.currentPath = []
         parent = childNode[-1]
         node.currentPath.insert(0, childNode[1])
-        #pdb.set_trace()
+        
         while parent != None:
-            #pdb.set_trace()
+            
             for i in range(len(node.closed)):
                 if parent == node.closed[i][0]:
                     parentNode = node.closed[i]
                     parent = parentNode[-1]
                     node.currentPath.insert(0, parentNode[1])
-            #pdb.set_trace()
+            
         util.pprint(node.currentPath)
+        
 
     def heuristic(self, node, result):
         #Heuristic calculation is how many same color spaces are touching. The lower the better
@@ -234,7 +251,7 @@ class AuxMethods:
         h = 0
         for i in range(len(matrix)):
             for j in range(len(matrix[i])):
-                #pdb.set_trace()
+                
                 letter = matrix[i][j]
 
                 try:
@@ -277,7 +294,7 @@ class AuxMethods:
                     temp.append(currentNode)
         node.open = temp
         #node.open.append(temp)
-        #pdb.set_trace()
+        
 
     def findNext(self, node):
         lowestH = 9999999999
@@ -285,6 +302,7 @@ class AuxMethods:
         for i in range(len(node.open)):
             currentNode = node.open[i]
             h = currentNode[2]
+            
             if h < lowestH:
                 lowestH = h
                 lowestNode = currentNode
