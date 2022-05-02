@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     match cmd:
         case 'random':
-            agent.random_walk(state, n)
+            agent.random_walk(state, n, node, aux)
         case "bfs":
             agent._search(state, "BFS", node, aux)
         case "dfs":

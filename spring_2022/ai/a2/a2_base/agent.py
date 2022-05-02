@@ -75,8 +75,7 @@ class Agent:
         aux.printCurrentPath(node, currentNode)
 
         while len(node.open) > 0 :
-            if parameter != "A*":
-                currentNode = aux.initalizeLoop(node)
+            currentNode = aux.initalizeLoop(node)
             if tally > 1:
                 clone = State(currentNode[1].__str__())
                 possible_actions = clone.actions()
@@ -87,20 +86,8 @@ class Agent:
                 aux.checkIfGoal(result_string, tally)
             if parameter == "DFS" and repeat == False:
                 aux.printCurrentPath(node, childNode)
-            if parameter == "A*":
-                currentNode = aux.findNext(node)
-                #pdb.set_trace()
-            #print(currentNode)
-            #pdb.set_trace()
-
-                
-            
-
-            #pdb.set_trace()
-
-
-
-
+            if parameter == "A*" and repeat == False:
+                aux.reorderOpen(node)
 
 
     def BFS(self, result, currentNode, node):
@@ -109,16 +96,11 @@ class Agent:
         node.addToBack(childNode)
         return childNode
 
-        
-
-
-
     def DFS(self, result, currentNode, node):
         node.parent_id = currentNode[0]
         childNode = node.createNode(node.id, result, node.parent_id)
         node.addToFront(childNode)
         return childNode
-
 
     def astar(self, result, currentNode, h, node):
         node.parent_id = currentNode[0]
@@ -129,10 +111,9 @@ class Agent:
 
 #-------------------------------random walk-------------------------------------------------------------------------
 
-    def random_walk(self, state, n):
-        currentNode = self.createNode(node.id, state.clone(), None)
+    def random_walk(self, state, n, node, aux):
+        currentNode = node.createNode(node.id, state.clone(), None)
         node.currentPathNodes.append(currentNode)
-        #pdb.set_trace()
         for i in range(n-1):
             node.id += 1
             node.parent_id += 1
@@ -141,8 +122,9 @@ class Agent:
             selection = random.randint(0, options-1)
             selected_action = actions[selection]
             result = state.execute(selected_action)
-            node = node.createNode(node.id, state.clone(), node.parent_id)
-            node.currentPathNodes.append(node)
+            currentNode = node.createNode(node.id, state.clone(), node.parent_id)
+            node.currentPathNodes.append(currentNode)
+            #pdb.set_trace()
         node.printStatesFromCurrentPath()
 
 
@@ -186,6 +168,8 @@ class AuxMethods:
             if result_string == node.closed[j][1]:
                 repeat = True
                 break
+        print(repeat)
+        #pdb.set_trace()
         return repeat
     
     def selectSearchMethod(self, agent, repeat, node, parameter, result, currentNode):
@@ -200,7 +184,9 @@ class AuxMethods:
 
             if parameter == "A*":
                 h = self.heuristic(node, result)
+                #pdb.set_trace()
                 childNode = agent.astar(result, currentNode, h, node)
+                #pdb.set_trace()
                 self.printCurrentPath(node, childNode)
            
             
@@ -219,7 +205,9 @@ class AuxMethods:
         node.currentPath = []
         parent = childNode[-1]
         node.currentPath.insert(0, childNode[1])
+        #pdb.set_trace()
         while parent != None:
+            #pdb.set_trace()
             for i in range(len(node.closed)):
                 if parent == node.closed[i][0]:
                     parentNode = node.closed[i]
@@ -246,6 +234,7 @@ class AuxMethods:
         h = 0
         for i in range(len(matrix)):
             for j in range(len(matrix[i])):
+                #pdb.set_trace()
                 letter = matrix[i][j]
 
                 try:
@@ -287,6 +276,7 @@ class AuxMethods:
                 if j == len(temp) - 1:
                     temp.append(currentNode)
         node.open = temp
+        #node.open.append(temp)
         #pdb.set_trace()
 
     def findNext(self, node):
