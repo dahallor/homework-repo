@@ -12,6 +12,8 @@ class InputLayer:
         self.validX = 0
         self.validY = 0
 
+        self.train = np.array([[]])
+
         self.trainX0 = np.array([])
         self.trainX1 = np.array([])
     

@@ -1,5 +1,6 @@
 import pdb
 import numpy as np
+import math
 
 
 
@@ -7,35 +8,105 @@ import numpy as np
 class Tree:
     def __init__(self, data):
         self.featureHash = {}
-        self.obsList = []
+        self.tree = []
+        self.examples = []
+        self.attributes = []
         self.entropy = []
         self.epsilon = .0000001
         self.total = len(data)
 
-    def setHash(self, IL):
+    def setAttribute(self, IL):
         for i in range(len(IL.trainX[0])):
             var = self.setVarName(i)
-            self.featureHash[var] = {"below avg" : [0, 0], "above avg": [0, 0], "entropy" : 0}
+            self.featureHash[var] = {0 : [0, 0], 1: [0, 0], "entropy" : 0}
+            self.attributes.append(var)
+
+    def setInitialExamples(self, IL):
+        rows = len(IL.trainX)
+        cols = len(IL.trainX[0]) + 1
+        self.train = np.zeros((rows, cols), dtype = int)
+        for i in range(len(IL.trainX)):
+            answer = int(IL.trainY[i][0])
+            for j in range(len(IL.trainX[i])):
+                feature_num = IL.trainX[i][j]
+                if feature_num < IL.mean[j]:
+                    IL.trainX[i][j] = 0
+                else:
+                    IL.trainX[i][j] = 1
+            temp = np.array([])
+            temp = np.append(IL.trainX[i], IL.trainY[i][0])
+            #pdb.set_trace()
+            for j in range(len(self.train[i])):
+                self.train[i][j] = temp[j]
+            self.examples.append(self.train[i])
+
+
+    def getExamples(self, examples):
+        pass
+
+    def DTL(self, examples, attributes, default, classification):
+
+        total = len(examples)
+        #classification = [0, 0]
+        for i in range(len(examples)):
+            if examples[i][-1] == 0:
+                classification[0] += 1
+            if examples[i][-1] == 1:
+                classification[1] += 1
+        if len(examples) == 0:
+            return default
+        elif classification[0] == total:
+            return 0
+        elif classification[1] == total:
+            return 1
+        elif len(attributes) == 0:
+            return math.mode(examples)
+        else:
+            pass
+
+
+
+    def getEntropy(self, attributes, examples, k):
+        sum = 0
+        self.featureHash = {}
+        for i in range(len(attributes)):
+            var = attributes[i]
+            self.featureHash[var] = np.zeros((1, k), dtype = int)
+        for i in range(len(examples)):
+            for j in range(len(examples[i])-1):
+                var = attributes[j]
+                if examples[i][-1] == 0:
+                    self.featureHash[var][0][0] += 1
+                if examples[i][-1] == 1:
+                    self.featureHash[var][0][1] += 1
+
+
+                
         
+
+        
+
+        
+
+
+
+
+
 
     def fillHashData(self, IL, type):
         for i in range(len(IL.trainX)):
-            observation = {}
             answer = int(IL.trainY[i][0])
-            observation["class"] = answer
             for j in range(len(IL.trainX[i])):
                 var = self.setVarName(j)
                 feature_num = IL.trainX[i][j]
                 if feature_num < IL.mean[j]:
                     #IL.trainX[i][j] = "below avg"
-                    feature = "below avg"
+                    feature = 0
                 else:
                     #IL.trainX[i][j] = "above avg"
-                    feature = "above avg"
-                observation[var] = feature
+                    feature = 1
                 if type == "binary":
                     self.setBinaryHash(var, answer, feature)
-            self.obsList.append(observation)
 
     def calcEntropy(self, k):
         for i in range(len(self.featureHash)):
@@ -95,11 +166,11 @@ class Tree:
 
 
 
-class Node(Tree):
-    def __init__(self):
-        super().__init__()
-        self.id = 1
-        node = {}
+class Node:
+    def __init__(self, data, left = None, right = None):
+        self.left = left
+        self.right = right
+        self.node = data
 
     
 
