@@ -18,6 +18,10 @@ class Node:
         node = [id, value, pointer]
         return node
 
+    def createAStarNode(self, id, value, h, pointer):
+        node = [id, value, h, pointer]
+        return node
+
     def addToFront(self, node):
         self.open.insert(0, node)
 
@@ -71,7 +75,8 @@ class Agent:
         aux.printCurrentPath(node, currentNode)
 
         while len(node.open) > 0 :
-            currentNode = aux.initalizeLoop(node)
+            if parameter != "A*":
+                currentNode = aux.initalizeLoop(node)
             if tally > 1:
                 clone = State(currentNode[1].__str__())
                 possible_actions = clone.actions()
@@ -82,6 +87,9 @@ class Agent:
                 aux.checkIfGoal(result_string, tally)
             if parameter == "DFS" and repeat == False:
                 aux.printCurrentPath(node, childNode)
+            if parameter == "A*":
+                currentNode = aux.findNext(node)
+                #pdb.set_trace()
             #print(currentNode)
             #pdb.set_trace()
 
@@ -112,8 +120,12 @@ class Agent:
         return childNode
 
 
-    def astar(self, state, h, node):
-        pass
+    def astar(self, result, currentNode, h, node):
+        node.parent_id = currentNode[0]
+        childNode = node.createAStarNode(node.id, result, h, node.parent_id)
+        node.addToBack(childNode)
+        return childNode
+        
 
 #-------------------------------random walk-------------------------------------------------------------------------
 
@@ -185,6 +197,11 @@ class AuxMethods:
 
             if parameter == "DFS":
                 childNode = agent.DFS(result, currentNode, node)
+
+            if parameter == "A*":
+                h = self.heuristic(node, result)
+                childNode = agent.astar(result, currentNode, h, node)
+                self.printCurrentPath(node, childNode)
            
             
             return childNode
@@ -194,6 +211,7 @@ class AuxMethods:
         #pdb.set_trace()
         if check.is_goal() == True:
             print(tally)
+            pdb.set_trace()
             sys.exit()
 
 
@@ -209,3 +227,76 @@ class AuxMethods:
                     node.currentPath.insert(0, parentNode[1])
             #pdb.set_trace()
         util.pprint(node.currentPath)
+
+    def heuristic(self, node, result):
+        #Heuristic calculation is how many same color spaces are touching. The lower the better
+        result = result.__str__()
+        split = [char for char in result]
+        matrix = []
+        temp = []
+        for i in range(len(split)):
+            if split[i] == "|":
+                matrix.append(temp)
+                temp = []
+                continue
+            temp.append(split[i])
+            if i == len(split)-1:
+                matrix.append(temp)
+
+        h = 0
+        for i in range(len(matrix)):
+            for j in range(len(matrix[i])):
+                letter = matrix[i][j]
+
+                try:
+                    if matrix[i][j-1] == letter:
+                        h += 1
+                except Exception:
+                    pass
+
+                try:
+                    if matrix[i][j+1] == letter:
+                        h += 1
+                except Exception:
+                    pass
+
+                try:
+                    if matrix[i-1][j] == letter:
+                        h += 1
+                except Exception:
+                    pass
+
+                try:
+                    if matrix[i+1][j] == letter:
+                        h += 1
+                except Exception:
+                    pass
+        return h
+
+    def reorderOpen(self, node):
+        temp = []
+        for i in range(len(node.open)):
+            currentNode = node.open[i]
+            h = currentNode[2]
+            if len(temp) == 0:
+                temp.append(currentNode)
+            for j in range(len(temp)):
+                if h < temp[j][2]:
+                    temp.insert(j, currentNode)
+                    break
+                if j == len(temp) - 1:
+                    temp.append(currentNode)
+        node.open = temp
+        #pdb.set_trace()
+
+    def findNext(self, node):
+        lowestH = 9999999999
+        lowestNode = None
+        for i in range(len(node.open)):
+            currentNode = node.open[i]
+            h = currentNode[2]
+            if h < lowestH:
+                lowestH = h
+                lowestNode = currentNode
+        return lowestNode
+        

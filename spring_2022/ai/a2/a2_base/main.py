@@ -25,6 +25,8 @@ if __name__ == '__main__':
             agent._search(state, "BFS", node, aux)
         case "dfs":
             agent._search(state, "DFS", node, aux)
+        case "astar":
+            agent._search(state, "A*", node, aux)
         case _:
             raise Exception("Command not recognized")
 
