@@ -16,12 +16,15 @@ class InputLayer:
 
         self.trainX0 = np.array([])
         self.trainX1 = np.array([])
+        self.trainX2 = np.array([])
+        self.trainX3 = np.array([])
     
         self.trainY0 = np.array([])
         self.trainY1 = np.array([])
+        self.trainY2 = np.array([])
+        self.trainY3 = np.array([])
 
-        self.debugX = np.array([])
-        self.debugY = np.array([])
+
 
     def getSpamItems(self):
             data = np.genfromtxt('spambase.data', delimiter = ",")

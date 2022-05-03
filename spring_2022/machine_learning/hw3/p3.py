@@ -1,6 +1,7 @@
 from prep import *
 from input import *
 from treev2 import *
+from node import *
 import pdb
 import sys
 
@@ -9,12 +10,12 @@ if __name__ == '__main__':
     IL = InputLayer()
     prep_data_p3(IL)
     tree_train = Tree(IL.trainX)
-    tree_valid = Tree(IL.validX)
 
     tree_train.convertFeaturesToBinary(IL, IL.trainX)
     tree_train.setInitialExamples(IL)
     tree_train.setAttributes(IL.trainX)
     tree_train.DTL(tree_train.examples, tree_train.attributes, 0, 2, "binary")
+    tree_train.printTree()
     #pdb.set_trace()
 
     '''

@@ -6,6 +6,10 @@ class Stats:
             "F+" : 0,
             "F-" : 0
         }
+        self.ratioMulticlass = {
+            "T" : 0,
+            "F" : 0
+        }
         self.accuracy = 0
         self.precision = 0
         self.recall = 0
@@ -20,6 +24,9 @@ class Stats:
     def printStats(self):
         print("Precision: {}\nRecall: {}\nF Measure: {}\nAccuracy: {}".format(self.precision, self.recall, self.f, self.accuracy))
 
+    def printAccuracy(self):
+        print("Accuracy: {}".format(self.accuracy))
+
     def addGuess(self, y, yhat):
         if int(y) == 1 and int(yhat) == 1:
             self.ratio["T+"] += 1
@@ -31,10 +38,24 @@ class Stats:
             self.ratio["T-"] += 1
         #pdb.set_trace()
 
+    def addGuessMulticlass(self, y, yhat):
+        if int(y) == 1 and int(yhat) == 1:
+            self.ratioMulticlass["T"] += 1
+        elif int(y) == 2 and int(yhat) == 2:
+            self.ratioMulticlass["T"] += 1
+        elif int(y) == 3 and int(yhat) == 3:
+            self.ratioMulticlass["T"] += 1
+        else:
+            self.ratioMulticlass["F"] += 1
 
     def setAccuracy(self):
         sum = self.ratio["T+"] + self.ratio["T-"]
         N = sum + self.ratio["F+"] + self.ratio["F-"]
+        self.accuracy = (1/N) * sum
+
+    def setAccuracyMulticlass(self):
+        sum = self.ratioMulticlass["T"]
+        N = sum + self.ratioMulticlass["F"]
         self.accuracy = (1/N) * sum
 
 

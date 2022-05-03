@@ -1,0 +1,3 @@
+-Unfortunately I cannot get the decision tree working and my carpel tunnel is acting up so this is what I have
+-My main attempt is found in treev2.py
+-The main files for each problem are seperated, so p2.py, p3.py, and p4.py for problem 2, 3, and 4 respectively
