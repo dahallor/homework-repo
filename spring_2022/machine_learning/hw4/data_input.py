@@ -6,10 +6,16 @@ class InputLayer:
         self.std = 0
 
     def getData(self):
-        pass
+        data = np.genfromtxt("lfw20.csv", delimiter = ",")
+        return data
 
-    def shuffleData(self):
-        pass
+    def splitData(self, data):
+        trans = data.transpose()
+        Yt = trans[0]
+        Y = np.array([Yt])
+        Y = Y.transpose()
+        X = np.delete(data, 0, axis = 1)
+        return X, Y
 
     def setMeanAndSTD(self, data):
         self.mean = np.mean(data, axis = 0)
@@ -23,3 +29,14 @@ class InputLayer:
 
         z = z.reshape((len(data), len(data[0])))
         return z
+
+    def reshape(self, temp):
+        X = np.array([])
+        for i in range(len(temp)):
+            image = temp[i]
+            X = np.append(X, image.reshape(87, 65))
+        return X
+
+        return X.reshape(87, 65)
+
+    
