@@ -10,11 +10,7 @@ if __name__ == '__main__':
     IL = InputLayer()
     plot = Plot()
     pca = PCA()
-
-    X, Y = prepP2(IL) 
-    image = np.array([X[-1]])
-    image = image.reshape(87, 65)
-    plot.displayImage(image)
-    pca.getPC(X)
-    pca.calcPC(plot, X)
-    pca.whiten(plot)
+    
+    prepP3(IL)
+    pca.getPCP3(IL.trainX)
+    

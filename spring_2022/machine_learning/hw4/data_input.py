@@ -23,6 +23,25 @@ class InputLayer:
         X = np.delete(data, 0, axis = 1)
         return X, Y
 
+    def splitDataP3(self, data):
+        trans = data.transpose()
+        Yt = trans[0]
+        Y = np.array([Yt])
+        Y = Y.transpose()
+        X = np.delete(data, 0, axis = 1)
+
+        training_size = int(np.ceil(len(data) * (2/3)))
+
+        self.trainX = X[:training_size]
+        self.trainY = Y[:training_size]
+        self.validX = X[training_size:]
+        self.validY = Y[training_size:]
+
+    def shuffleData(self, data, num):
+        np.random.seed(num)
+        np.random.shuffle(data)
+        return data
+
     def setMeanAndSTD(self, data):
         self.mean = np.mean(data, axis = 0)
         self.std = np.std(data, axis = 0, ddof = 1)
@@ -63,14 +82,6 @@ class InputLayer:
         z = z.reshape((len(data), len(data[0])))
         return z
 
-    def reshape(self, temp):
-        X = np.zeros((len(temp), 87, 65))
-        for i in range(len(temp)):
-            image = temp[i]
-            image = image.reshape(87, 65)
-            for j in range(len(image)):
-                for k in range(len(image[j])):
-                    X[i][j][k] = image[j][k]
-        return X
+
 
     

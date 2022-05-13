@@ -12,6 +12,18 @@ class Plot:
         plt.legend()
         plt.show()
 
+    def plotPCA(self, PC1, PC2):
+        plt.xlabel("PC-1")
+        plt.ylabel("PC-2")
+        plt.scatter(PC1, PC2)
+        plt.show()
+
+    def plotPCA_Whiten(self, PC1, PC2):
+        plt.xlabel("PC-1")
+        plt.ylabel("PC-2")
+        plt.scatter(PC1, PC2)
+        plt.show()
+
     def plotP1_1D(self, PC1, PC2):
         PC1_c1 = PC1[:5]
         PC1_c2 = PC1[5:]
@@ -38,4 +50,8 @@ class Plot:
         plt.scatter(LDA_1, Y, marker = "s", color = "blue", label = "Class 1, PC1")
         plt.scatter(LDA_2, Y, marker = "o", color = "orange", label = "Class 2, PC2")
         plt.legend()
+        plt.show()
+
+    def displayImage(self, img_arr):
+        plt.imshow(img_arr, cmap = "gray")
         plt.show()
