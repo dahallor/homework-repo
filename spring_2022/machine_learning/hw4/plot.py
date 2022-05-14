@@ -18,6 +18,12 @@ class Plot:
         plt.scatter(PC1, PC2)
         plt.show()
 
+    def plotPCA_P4_TopValue(self, PC):
+        Y = np.zeros((len(PC), 1))
+        plt.xlabel("PC")
+        plt.scatter(PC, Y)
+        plt.show()
+
     def plotPCA_Whiten(self, PC1, PC2):
         plt.xlabel("PC-1")
         plt.ylabel("PC-2")
