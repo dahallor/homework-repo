@@ -73,6 +73,8 @@ class PCA:
         self.eigvaluesValid, self.eigvectorsValid = _getEig(cov)
         max_values = _getAllEigs(self.eigvaluesValid)
         return max_values
+
+ #==================================================================================================================
     
     def calcPC(self, plot, X):
         self.PC1 = np.zeros((len(X), 1))
@@ -90,8 +92,16 @@ class PCA:
         for i in range(len(X)):
             obs = X[i]
             self.PC[i] = np.matmul(obs, self.eigvector1)
-        pdb.set_trace()
 
+    def calcPC_Threshold(self, X, max_values):
+        self.PC = np.zeros((len(X), len(max_values)))
+        print("Calculating Principle Components...")
+        for i in range(len(X)):
+            obs = X[i]
+            for j in range(len(max_values)):
+                index = max_values[j]
+                curentEigvector = self.eigvectors[:, index:index+1]
+                self.PC[i][j] = np.matmul(obs, curentEigvector)
 
     def whiten(self, plot):
         values = np.real(self.eigvalues)
@@ -102,6 +112,43 @@ class PCA:
         self.eigvector2 = self.eigvector2/(np.sqrt(eig2))
 
         plot.plotPCA_Whiten(self.eigvector1, self.eigvector2)
+
+
+    def uncompressTopValue(self):
+        Zt = self.PC.transpose()
+        W = self.eigvector1
+        X_hat = np.matmul(W, Zt)
+        X_hat = X_hat.transpose()
+        return X_hat
+
+    def uncompressThreshold(self, X, max_values):
+        Zt = self.PC.transpose()
+        #W = np.zeros((len(X[0]), len(max_values)))
+        #W = W.transpose()
+        W = np.array([])
+        for i in range(len(max_values)):
+            index = max_values[i]
+            currentEigvector = self.eigvectors[:, index:index+1]
+            W = np.insert(W, i, currentEigvector, axis = 1)
+        #W = W.tranpose()
+        X_hat = np.matmul(W, Zt)
+        X_hat = X_hat.transpose()
+        return X_hat
+            
+
+
+
+    def selectTopEigValues(self):
+        count = 0
+        currentEig = 0
+        totalEig = np.sum(self.eigvalues)
+        for i in range(len(self.eigvalues)):
+            currentEig += self.eigvalues[i]
+            alpha = currentEig/totalEig
+            count += 1
+            if alpha >= .95:
+                return count
+
 
 
 
