@@ -11,12 +11,11 @@ if __name__ == '__main__':
     IL = InputLayer()
     plot = Plot()
     pca = PCA()
-    knn = KNN()
     
     prepP3(IL)
-    max_values = pca.getPCP3_All(IL.trainX)
-    knn.plottingPoints(pca, max_values, IL.trainX)
+    knn_no_pca = KNN()
+    knn_no_pca.findNearestNeighbors(IL)
+    total = len(IL.validX)
+    knn_no_pca.getAccuracy(total)
 
-    max_values_valid = pca.getPC_P3_Valid_All(IL.validX)
-    knn.plottingPoints(pca, max_values_valid, IL.validX)
     
