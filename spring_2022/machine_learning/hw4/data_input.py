@@ -52,11 +52,10 @@ class InputLayer:
 
         self.mean_c1 = np.mean(X_class1, axis=0)
         self.mean_c2 = np.mean(X_class2, axis=0)
-        '''
+        print("Means")
         print(self.mean_c1)
         print(self.mean_c2)
         print()
-        '''
 
         x = X_class1 - self.mean_c1
         xt = x.transpose()
@@ -65,10 +64,11 @@ class InputLayer:
         x = X_class2 - self.mean_c2
         xt = x.transpose()
         self.std_c2 = np.matmul(xt, x)
-        '''
+        
+        print("Sigmas")
         print(self.std_c1)
         print(self.std_c2)
-        '''
+        print()
 
 
 

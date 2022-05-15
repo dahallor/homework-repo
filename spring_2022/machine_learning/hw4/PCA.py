@@ -123,14 +123,12 @@ class PCA:
 
     def uncompressThreshold(self, X, max_values):
         Zt = self.PC.transpose()
-        #W = np.zeros((len(X[0]), len(max_values)))
-        #W = W.transpose()
-        W = np.array([])
+        W = np.zeros((len(X[0]), len(max_values)))
+        print("Uncompressing...")
         for i in range(len(max_values)):
             index = max_values[i]
             currentEigvector = self.eigvectors[:, index:index+1]
-            W = np.insert(W, i, currentEigvector, axis = 1)
-        #W = W.tranpose()
+            W[:, i:i+1] = currentEigvector
         X_hat = np.matmul(W, Zt)
         X_hat = X_hat.transpose()
         return X_hat

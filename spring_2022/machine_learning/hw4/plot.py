@@ -30,19 +30,15 @@ class Plot:
         plt.scatter(PC1, PC2)
         plt.show()
 
-    def plotP1_1D(self, PC1, PC2):
+    def plotP1_1D(self, PC1):
         PC1_c1 = PC1[:5]
         PC1_c2 = PC1[5:]
-        PC2_c1 = PC2[:5]
-        PC2_c2 = PC2[5:]
         Y = np.zeros((5, 1))
 
         plt.xlabel("X")
         plt.ylim(-.00000001, 0.00000001)
-        plt.scatter(PC1_c1, Y, marker = "s", color = "blue", label = "Class 1, PC1")
-        plt.scatter(PC2_c1, Y, marker = "s", color = "orange", label = "Class 1, PC2")
-        plt.scatter(PC1_c2, Y, marker = "o", color = "blue", label = "Class 2, PC1")
-        plt.scatter(PC2_c2, Y, marker = "o", color = "orange", label = "Class 2, PC2")
+        plt.scatter(PC1_c1, Y, marker = "s", color = "blue", label = "Class 1")
+        plt.scatter(PC1_c2, Y, marker = "o", color = "orange", label = "Class 2")
         plt.legend()
         plt.show()
 
@@ -58,6 +54,7 @@ class Plot:
         plt.legend()
         plt.show()
 
-    def displayImage(self, img_arr):
+    def displayImage(self, img_arr, text):
+        plt.title(text)
         plt.imshow(img_arr, cmap = "gray")
         plt.show()

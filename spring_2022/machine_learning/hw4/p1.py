@@ -18,7 +18,7 @@ def _PCA(IL, plot, X, Y):
         c2_Y = np.append(c2_Y, X_class2[i][1])
     
     #Uncomment to reveal plot for part 1.a
-    #plot.plotP1(c1_X, c1_Y, c2_X, c2_Y)
+    plot.plotP1(c1_X, c1_Y, c2_X, c2_Y)
 
     #Covraince
     Xt = X.transpose()
@@ -26,7 +26,7 @@ def _PCA(IL, plot, X, Y):
     ddof_size = N-1
     #cov = (np.matmul(Xt, X))/(N-1)
     cov = np.cov(Xt)
-    print()
+    print("Covarience Matrix")
     print(cov)
     print()
 
@@ -35,6 +35,13 @@ def _PCA(IL, plot, X, Y):
     eigvalues, eigvectors = np.linalg.eig(cov)
     eigvector1 = eigvectors[:, :1]
     eigvector2 = eigvectors[:, 1:]
+    print("Eigenvalues")
+    print(eigvalues)
+    print("Eig 1")
+    print(eigvector1)
+    print("Eig 2")
+    print(eigvector2)
+    print()
 
     #PCA
     PC1 = np.zeros((len(X), 1))
@@ -43,7 +50,12 @@ def _PCA(IL, plot, X, Y):
         obs = X[i]
         PC1[i] = np.matmul(obs, eigvector1)
         PC2[i] = np.matmul(obs, eigvector2)
-    plot.plotP1_1D(PC1, PC2)
+    print("PCA-1")
+    print(PC1)
+    print("PCA-2")
+    print(PC2)
+    print()
+    plot.plotP1_1D(PC1)
 
 def _LDA(IL, plot, X, Y):
     IL.setMeanByClass(X)
@@ -56,29 +68,28 @@ def _LDA(IL, plot, X, Y):
     for i in range(len(x[0])):
         xt[i][0] = x[0][i]
     Sb = np.matmul(xt, x)
-    '''
-    pdb.set_trace()
-
-    print()
+    print("Sw")
     print(Sw)
-    print()
+    print("Inverse")
     print(inv)
-    print()
+    print("Sb")
     print(Sb)
-    '''
+    print()
+
     matrix = np.matmul(inv, Sb)
     eigvalues, eigvectors = np.linalg.eig(matrix)
     eigvector1 = eigvectors[:, :1]
     eigvector2 = eigvectors[:, 1:]
-    '''
+
+    print("matrix")
     print(matrix)
-    print()
+    print("Eig Values")
     print(eigvalues)
-    print()
+    print("Eig vector 1")
     print(eigvector1)
-    print()
+    print("Eig vector 2")
     print(eigvector2)
-    '''
+    print()
     
     LDA = np.zeros((len(X), 1))
     for i in range(len(X)):
@@ -98,7 +109,7 @@ if __name__ == '__main__':
     IL.setMeanAndSTD(X)
     X = IL.zScore(X)
 
-    #_PCA(IL, plot, X, Y)
+    _PCA(IL, plot, X, Y)
     _LDA(IL, plot, X, Y)
 
 
