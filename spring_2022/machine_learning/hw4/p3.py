@@ -11,11 +11,30 @@ if __name__ == '__main__':
     IL = InputLayer()
     plot = Plot()
     pca = PCA()
+    knn_no_pca = KNN()
+    knn_pca = KNN()
+    knn_whiten = KNN()
     
     prepP3(IL)
-    knn_no_pca = KNN()
-    knn_no_pca.findNearestNeighbors(IL)
     total = len(IL.validX)
+
+    '''
+    knn_no_pca.findNearestNeighbors(IL)
     knn_no_pca.getAccuracy(total)
+    
+
+    max_values = pca.getPCP3_100(IL.trainX)
+    trainPC = pca.calcPC_Threshold(IL.trainX, max_values)
+    validPC = pca.calcPC_Threshold(IL.validX, max_values)
+    knn_pca.findNearestNeighbors(IL, validPC, trainPC)
+    knn_pca.getAccuracy(total)
+    '''
+
+    max_values = pca.getPCP3_100(IL.trainX)
+    trainPC = pca.calcPC_Whitened(IL.trainX, max_values)
+    validPC = pca.calcPC_Whitened(IL.validX, max_values)
+    knn_whiten.findNearestNeighbors(IL, validPC, trainPC)
+    knn_whiten.getAccuracy(total)
+    
 
     

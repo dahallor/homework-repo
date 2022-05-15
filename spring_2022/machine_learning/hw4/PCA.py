@@ -102,6 +102,20 @@ class PCA:
                 index = max_values[j]
                 curentEigvector = self.eigvectors[:, index:index+1]
                 self.PC[i][j] = np.matmul(obs, curentEigvector)
+        return self.PC
+
+    def calcPC_Whitened(self, X, max_values):
+        self.PC = np.zeros((len(X), len(max_values)))
+        values = np.real(self.eigvalues)
+        print("Calculating Whitened Principle Components...")
+        for i in range(len(X)):
+            obs = X[i]
+            for j in range(len(max_values)):
+                index = max_values[j]
+                currentEigvector = self.eigvectors[:, index:index+1]
+                currentEigvector = currentEigvector/(np.sqrt(values[i]))
+                self.PC[i][j] = np.matmul(obs, currentEigvector)
+        return self.PC
 
     def whiten(self, plot):
         values = np.real(self.eigvalues)
@@ -112,6 +126,7 @@ class PCA:
         self.eigvector2 = self.eigvector2/(np.sqrt(eig2))
 
         plot.plotPCA_Whiten(self.eigvector1, self.eigvector2)
+
 
 
     def uncompressTopValue(self):

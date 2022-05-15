@@ -11,15 +11,15 @@ class KNN:
         self.lowest_value = []
         self.index = []
 
-    def findNearestNeighbors(self, IL):
+    def findNearestNeighbors(self, IL, validX, trainX):
         print("Finding Nearest Neighbors...")
-        for i in range(len(IL.validX)):
-            print(i)
-            self._statusUpdate(i)
+        for i in range(len(validX)):
+            if i % 100 == 0:
+                print("Observation {} out of {}".format(i, len(validX)))
             self._setArray()
-            validX_vector = IL.validX[i]
+            validX_vector = validX[i]
             yhat = int(IL.validY[i][0])
-            distances = self._distance(IL, validX_vector, i)
+            distances = self._distance(trainX, validX_vector, i)
             for j in range(self.k):
                 for k in range(len(distances)):
                     if distances[k] < self.lowest_value[j] and k not in self.index:
@@ -36,11 +36,11 @@ class KNN:
             
 
 
-    def _distance(self, IL, validX_vector, i):
+    def _distance(self, trainX, validX_vector, i):
         distances = []
-        for j in range(len(IL.trainX)):
+        for j in range(len(trainX)):
             sum = 0
-            trainX_vector = IL.trainX[j]
+            trainX_vector = trainX[j]
             for k in range(len(validX_vector)):
                 dif = validX_vector[k] - trainX_vector[k]
                 sum += math.pow(dif, 2)
@@ -63,19 +63,6 @@ class KNN:
         mode = stat.mode(classes)
         if mode == yhat:
             self.numCorrect += 1
-
-    def _statusUpdate(self, i):
-        match i:
-            case 200:
-                print("25% Complete")
-            case 400:
-                print("50% Complete")
-            case 600:
-                print("75% Complete")
-            case 800:
-                print("99% Complete")
-            case _:
-                return
     
             
 
