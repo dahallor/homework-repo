@@ -15,27 +15,26 @@ if __name__ == '__main__':
 
     match p1:
         case "human":
-            p1 = HumanPlayer()
+            p1 = HumanPlayer("X")
         case "random":
-            p1 = RandomPlayer()
+            p1 = RandomPlayer("X")
         case "minimax":
-            p1 = MinimaxPlayer()
+            p1 = MinimaxPlayer("X")
         case _:
             raise Exception("Invalid player type, please try again")
 
     match p2:
         case "human":
-            p2 = HumanPlayer()
+            p2 = HumanPlayer("O")
         case "random":
-            p2 = RandomPlayer()
+            p2 = RandomPlayer("O")
         case "minimax":
-            p2 = MinimaxPlayer()
+            p2 = MinimaxPlayer("O")
         case _:
             raise Exception("Invalid player type, please try again")
-
-
 
     state = State()
     game = Game(p1, p2)
     game.play(state)
+    #pdb.set_trace()
 

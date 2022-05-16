@@ -1,9 +1,9 @@
 import sys
+import util
 
 class Player:
     def __init__(self):
-        self.p1_char = "X"
-        self.p2_char = "O"
+        pass
 
     def choose_action(self, state):
         pass
@@ -14,4 +14,19 @@ class Game:
         self.p2 = p2
 
     def play(self, state):
-        pass
+        states = []
+        while state.game_over() == False:
+            state = self.p1.choose_action(state)
+            states.append(state.clone())
+            util.pprint(state)
+            if state.winner() != None:
+                break
+            state = self.p2.choose_action(state)
+            util.pprint(state)
+            states.append(state.clone())
+            if state.winner() != None:
+                break
+        winner = state.winner()
+        print("{} Wins!".format(winner))
+        util.pprint(states)
+        
