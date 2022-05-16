@@ -2,8 +2,8 @@ from game import *
 
 class HumanPlayer(Player):
     def __init__(self, char):
-        super().__init__()
-        self.char = char
+        super().__init__(char)
+
 
     def choose_action(self, state):
         actions = state.actions(self.char)

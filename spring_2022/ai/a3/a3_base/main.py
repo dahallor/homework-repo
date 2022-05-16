@@ -35,6 +35,8 @@ if __name__ == '__main__':
 
     state = State()
     game = Game(p1, p2)
-    game.play(state)
+    node = Node()
+    tree = Tree()
+    game.play(state, node, tree)
     #pdb.set_trace()
 
