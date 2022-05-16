@@ -18,18 +18,18 @@ if __name__ == '__main__':
     prepP3(IL)
     total = len(IL.validX)
 
-    '''
-    knn_no_pca.findNearestNeighbors(IL)
+    #No PCA
+    knn_no_pca.findNearestNeighbors(IL, IL.validX, IL.trainX)
     knn_no_pca.getAccuracy(total)
     
-
+    #PCA
     max_values = pca.getPCP3_100(IL.trainX)
     trainPC = pca.calcPC_Threshold(IL.trainX, max_values)
     validPC = pca.calcPC_Threshold(IL.validX, max_values)
     knn_pca.findNearestNeighbors(IL, validPC, trainPC)
     knn_pca.getAccuracy(total)
-    '''
 
+    #PCA Whitened
     max_values = pca.getPCP3_100(IL.trainX)
     trainPC = pca.calcPC_Whitened(IL.trainX, max_values)
     validPC = pca.calcPC_Whitened(IL.validX, max_values)
