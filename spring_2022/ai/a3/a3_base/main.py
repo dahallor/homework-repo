@@ -33,6 +33,7 @@ if __name__ == '__main__':
         case _:
             raise Exception("Invalid player type, please try again")
 
+
     state = State()
     game = Game(p1, p2)
     game.play(state)
