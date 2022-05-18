@@ -26,50 +26,60 @@ class MinimaxPlayer(Player):
             "penality": .75}
 
     def choose_action(self, state):
-        tree = Tree()
-        clone = state.clone()
-        root = Node(self.id, clone, None, None)
-        root = root.createNode()
-        tree.addToTree(root)
-        selection = self.minimax(root, tree)
-        state.execute(selection)
+        root = [None, None]
+        root[0] = state.clone()
+        selection = self.minimax(root, True)
+        state.execute(selection[0])
         return state
         
-    def minimax(self, root, tree):
-        root_state = root[1]
-        actions = root_state.actions(self.char)
-        for i in range(len(actions)):
-            action = actions[i]
-            clone = root_state.clone()
-            new = clone.execute(action)
-            self.id += 1
-            node = Node(self.id, new, None, root[0])
-            node = node.createNode()
-            tree.addToTree(node)
-        pdb.set_trace()
-        #return selection
+    def minimax(self, node, isMaxPlayer):
+        state = node[0]
+        result = self.terminal_test(state)
+        #pdb.set_trace()
+        if result != None:
+            node[1] = result
+            return node
 
-    def _max_value(self, state):
-        test = self.terminal_test(state)
-        if test != None:
-            return test * self.values["penality"]
-        else:    
-            maxValue = -math.inf
-
-    def _min_value(self, state):
-        test = self.terminal_test(state)
-        if test != None:
-            return test * self.values["penality"]
-        else:    
-            minValue = math.inf
-            clone = state.clone()
-            actions = clone.actions()
-            for action in actions:
-                min(self._max_values)
+        if isMaxPlayer == True:
+            maxScore = -math.inf
+            node = [state, maxScore]
+            actions = state.actions(self.char)
+            for i in range(len(actions)):
+                clone = state.clone()
+                exe = clone.execute(actions[i])
+                node[0] = exe
+                node[1] = maxScore
+                #pdb.set_trace()
+                node = self.minimax(node, False)
+                score = node[1]
+                if score > maxScore:
+                    maxScore = score
+                    node[0] = exe
+                    node[1] = maxScore * self.values["penality"]
+            #pdb.set_trace()
+            return node
 
 
+        if isMaxPlayer == False:
+            minScore = math.inf
+            node = [state, minScore]
+            actions = state.actions(self.char)
+            for i in range(len(actions)):
+                print(i)
+                clone = state.clone()
+                exe = clone.execute(actions[i])
+                node[0] = exe
+                node[1] = minScore
+                node = self.minimax(node, True)
+                score = node[1]
+                if score < minScore:
+                    minScore = score
+                    node[0] = exe
+                    node[1] = minScore * self.values["penality"]
+            return node
 
     def terminal_test(self, state):
+        #pdb.set_trace()
         if state.game_over == True:
             winner = state.winner
             if winner == self.char:
@@ -81,27 +91,4 @@ class MinimaxPlayer(Player):
         else:
             return None
 
-
-class Tree:
-    def __init__(self):
-        self.tree = []
-
-    def clearTree(self):
-        self.tree =[]
-
-    def addToTree(self, node):
-        self.tree.append(node)
-
-
-
-class Node:
-    def __init__(self, id, state, value, parent_id):
-        self.id = id
-        self.parent_id = parent_id
-        self.state = state
-        self.value = value
-
-    def createNode(self):
-        data_node = [self.id, self.state, self.value, self.parent_id]
-        return data_node
 
