@@ -26,68 +26,101 @@ class MinimaxPlayer(Player):
             "penality": .75}
 
     def choose_action(self, state):
-        root = [None, None]
-        root[0] = state.clone()
-        selection = self.minimax(root, True)
-        state.execute(selection[0])
+        root = Node(1, state.clone(), None, None)
+        tree = Tree()
+        tree.addToTree(root.data)
+        player_sym = self.char
+        if player_sym == "X":
+            opponent_sym = "O"
+        else:
+            opponent_sym = "X"
+        selection = self.minimax(root, tree, player_sym, opponent_sym, True)
+        pdb.set_trace()
+        state.execute(selection.data[1])
         return state
         
-    def minimax(self, node, isMaxPlayer):
-        state = node[0]
-        result = self.terminal_test(state)
+    def minimax(self, node, tree, player_sym, opponent_sym, isMaxPlayer):
+        result = self.terminal_test(node)
         #pdb.set_trace()
         if result != None:
-            node[1] = result
+            node.data[2] = result
             return node
 
         if isMaxPlayer == True:
             maxScore = -math.inf
-            node = [state, maxScore]
-            actions = state.actions(self.char)
+            state = node.data[1]
+            actions = state.actions(player_sym)
+            parent_id = node.data[0]
+            id = parent_id + 1
+            branch = []
             for i in range(len(actions)):
                 clone = state.clone()
                 exe = clone.execute(actions[i])
-                node[0] = exe
-                node[1] = maxScore
-                #pdb.set_trace()
-                node = self.minimax(node, False)
-                score = node[1]
-                if score > maxScore:
-                    maxScore = score
-                    node[0] = exe
-                    node[1] = maxScore * self.values["penality"]
+                node = Node(id, exe, None, parent_id)
+                tree.addToTree(node.data)
+                branch.append(node)
+                id += 1
             #pdb.set_trace()
+            for i in range(len(branch)):
+                current_node = branch[i]
+                node = self.minimax(current_node, tree, player_sym, opponent_sym, False)
+                score = node.data[2]
+                try:
+                    if score > maxScore:
+                        maxScore = score
+                        node.data[1] = exe
+                        node.data[2] = maxScore * self.values["penality"]
+                except TypeError:
+                    pass
             return node
-
 
         if isMaxPlayer == False:
             minScore = math.inf
-            node = [state, minScore]
-            actions = state.actions(self.char)
+            state = node.data[1]
+            actions = state.actions(opponent_sym)
+            parent_id = node.data[0]
+            id = parent_id + 1
+            branch = []
             for i in range(len(actions)):
-                print(i)
                 clone = state.clone()
                 exe = clone.execute(actions[i])
-                node[0] = exe
-                node[1] = minScore
-                node = self.minimax(node, True)
-                score = node[1]
-                if score < minScore:
-                    minScore = score
-                    node[0] = exe
-                    node[1] = minScore * self.values["penality"]
+                node = Node(id, exe, None, parent_id)
+                tree.addToTree(node.data)
+                branch.append(node)
+                id += 1
+            #pdb.set_trace()
+            for i in range(len(branch)):
+                current_node = branch[i]
+                node = self.minimax(current_node, tree, player_sym, opponent_sym, True)
+                score = node.data[2]
+                try:
+                    if score < minScore:
+                        maxScore = score
+                        node.data[1] = exe
+                        node.data[2] = maxScore * self.values["penality"]
+                except TypeError:
+                    pass
             return node
 
-    def terminal_test(self, state):
+
+
+
+    def terminal_test(self, node):
         #pdb.set_trace()
-        if state.game_over == True:
+        state = node.data[1]
+        #pdb.set_trace()
+        if state.game_over() == True:
+            #pdb.set_trace()
             winner = state.winner
             if winner == self.char:
-                return self.values["win"]
-            if (self.char == "X" and winner == "O") or (self.char == "O" and winner == "X"):
-                return self.values["lose"]
+                node.data[2] = self.values["win"]
+                return node
+            elif (self.char == "X" and winner == "O") or (self.char == "O" and winner == "X"):
+                node.data[2] = self.values["lose"]
+                return node
             else:
-                return self.values["tie"]
+                node.data[2] = self.values["tie"]
+                return node
         else:
             return None
 
