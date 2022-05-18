@@ -91,4 +91,22 @@ class MinimaxPlayer(Player):
         else:
             return None
 
+class Tree:
+    def __init__(self):
+        self.tree = []
 
+    def clearTree(self):
+        self.tree =[]
+
+    def addToTree(self, node):
+        self.tree.append(node)
+
+
+
+class Node:
+    def __init__(self, id, state, value, parent_id):
+        self.id = id
+        self.parent_id = parent_id
+        self.state = state
+        self.value = value
+        self.data = [self.id, self.state, self.value, self.parent_id]
