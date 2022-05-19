@@ -1,4 +1,3 @@
-from numpy import Infinity
 from game import *
 import random
 import math
@@ -18,175 +17,96 @@ class RandomPlayer(Player):
 class MinimaxPlayer(Player):
     def __init__(self, char):
         super().__init__(char)
-        self.id = 1
         self.values = {
             "win" : 1,
             "tie" : 0,
             "lose" : -1,
             "penality": .75}
+        self.player_sym = self.char
+        self.penalties = 0
+        if self.player_sym == "X":
+            self.opponent_sym = "O"
+        else:
+            self.opponent_sym = "X"
+
+        
 
     def choose_action(self, state):
-        self.id = 1
-        root = Node(self.id, state.clone(), [None, -math.inf], None)
-        self.id += 1
-        tree = Tree()
-        tree.addToTree(root.data)
-        player_sym = self.char
-        if player_sym == "X":
-            opponent_sym = "O"
-        else:
-            opponent_sym = "X"
-        '''
-        id = 2
-        branch = []
-        actions = state.actions()
-        for i in range(len(actions)):
-            clone = state.clone()
-            exe = clone.execute(actions[i])
-            node = Node(id, exe, -math.inf, 1)
-            tree.addToTree(node.data)
-            branch.append(node)
-            id += 1
-        for i in range(len(branch)):
-            node = branch[i]
-            selection = self.minimax(node, tree, player_sym, opponent_sym, True)
-            node = branch[i]
-            '''
+        possible_actions = state.actions(self.player_sym)
+        selection = self.findBestMove(state)
         #pdb.set_trace()
-        selection = self.minimax(root, tree, player_sym, opponent_sym, False)
-        pdb.set_trace()
-        state.execute(selection.data[1])
+        state.execute(possible_actions[selection])
+        self.penalties = 0
         return state
-        
-    def minimax(self, node, tree, player_sym, opponent_sym, isMaxPlayer):
-        result = self.terminal_test(node)
-        #print(result)
-        #pdb.set_trace()
-        if result != None:
-            #pdb.set_trace()
-            return result
 
+    def findBestMove(self, state):
+        maxScore = -math.inf
+        root = Node(self.player_sym, state, None)
+        root.expand(self, self.opponent_sym)
+        for child in range(len(root.children)):
+            #print(root.children[child].state.__str__())
+            score = self.minimax(root.children[child], False)
+            #pdb.set_trace()
+            if score > maxScore:
+                maxScore = score
+                selection = child
+        return selection
+
+        
+    def minimax(self, node, isMaxPlayer):
+        result = self.terminal_test(node, self.player_sym)
+        if result != None:
+            return result.value
+        
         if isMaxPlayer == True:
             maxScore = -math.inf
-            scoreList = [None, maxScore]
-            state = node.data[1]
-            actions = state.actions(player_sym)
-            parent_id = node.data[0]
-            branch = []
-            for i in range(len(actions)):
-                clone = state.clone()
-                exe = clone.execute(actions[i])
-                node = Node(self.id, exe, scoreList, parent_id)
-                tree.addToTree(node.data)
-                branch.append(node)
-                self.id += 1
+            new_node = Node(self.player_sym, node.state, None)
+            new_node.expand(self, self.opponent_sym)
             #pdb.set_trace()
-            for i in range(len(branch)):
-                current_node = branch[i]
-                #pdb.set_trace()
-                node = self.minimax(current_node, tree, player_sym, opponent_sym, False)
-                #node = self.minimax(current_node, tree, player_sym, opponent_sym, True)
-                #pdb.set_trace()
-                branch[i] = node
-            #pdb.set_trace()
-            for i in range(len(branch)):
-                node = branch[i]
-                #pdb.set_trace()
-                print(node.data)
-                score = node.data[2][1]
-                if score > maxScore:
-                    maxScore = score
-                    num = node.data[2][0]
-            for i in range(len(branch)):
-                node = branch[i]
-                #pdb.set_trace()
-                if node.data[2][1] == maxScore:
-                    return_node = node
-                    num = return_node.data[0]
-                    new_score = maxScore * self.values["penality"]
-                    return_node.data[2] = [num, new_score]
-                    #pdb.set_trace()
-                    return return_node
+            for child in range(len(new_node.children)):
+                score = self.minimax(new_node.children[child], False)
+                maxScore = max(score, maxScore)
+            return maxScore
+            
 
         if isMaxPlayer == False:
             minScore = math.inf
-            scoreList = [None, minScore]
-            state = node.data[1]
-            actions = state.actions(opponent_sym)
-            parent_id = node.data[0]
-            branch = []
-            for i in range(len(actions)):
-                clone = state.clone()
-                exe = clone.execute(actions[i])
-                node = Node(self.id, exe, scoreList, parent_id)
-                tree.addToTree(node.data)
-                branch.append(node)
-                self.id += 1
-            #pdb.set_trace()
-            for i in range(len(branch)):
-                current_node = branch[i]
-                #pdb.set_trace()
-                node = self.minimax(current_node, tree, player_sym, opponent_sym, True)
-                #pdb.set_trace()
-                branch[i] = node
-            for i in range(len(branch)):
-                node = branch[i]
-                scoreList = node.data[2]
-                print(scoreList)
-                score = scoreList[1]
-                if score < minScore:
-                    minScore = score
-            for i in range(len(branch)):
-                node = branch[i]
-                #pdb.set_trace()
-                if node.data[2][1] == minScore:
-                    return_node = node
-                    num = return_node.data[0]
-                    new_score = minScore * self.values["penality"]
-                    return_node.data[2] = [num, new_score]
-                    return return_node
+            new_node = Node(self.opponent_sym, node.state, None)
+            new_node.expand(self, self.player_sym)
+            for child in range(len(new_node.children)):
+                score = self.minimax(new_node.children[child], True)
+                minScore = min(score, minScore)
+            return minScore
 
 
 
-
-    def terminal_test(self, node):
-        #pdb.set_trace()
-        state = node.data[1]
-        #pdb.set_trace()
-        if state.game_over() != False:
-            #pdb.set_trace()
-            winner = state.winner()
-            if winner == self.char:
-                node.data[2] = [node.data[0], self.values["win"]]
-                #pdb.set_trace()
-                return node
-            elif (self.char == "X" and winner == "O") or (self.char == "O" and winner == "X"):
-                node.data[2] = [node.data[0], self.values["lose"]]
-                #pdb.set_trace()
-                return node
+    def terminal_test(self, node, sym):
+        if node.state.game_over() != False:
+            if node.state.winner() == sym:
+                node.value = self.values["win"]
+            elif node.state.winner() != sym:
+                node.value = self.values["lose"]
             else:
-                node.data[2] = [node.data[0], self.values["tie"]]
-                #pdb.set_trace()
-                return node
+                node.value = self.values["tie"]
+            p = math.pow(self.values["penality"], self.penalties)
+            node.value *= p
+            return node
         else:
             return None
 
-class Tree:
-    def __init__(self):
-        self.tree = []
-
-    def clearTree(self):
-        self.tree =[]
-
-    def addToTree(self, node):
-        self.tree.append(node)
-
-
 
 class Node:
-    def __init__(self, id, state, value, parent_id):
-        self.id = id
-        self.parent_id = parent_id
+    def __init__(self, char, state, value, parent = None, actions = None):
         self.state = state
         self.value = value
-        self.data = [self.id, self.state, self.value, self.parent_id]
+        self.parent = parent
+        self.children = []
+        self.actions = self.state.actions(char)
+
+    def expand(self, minimax, char):
+        minimax.penalties += 1
+        for action in self.actions:
+            clone = self.state.clone()
+            childNode = Node(char, clone.execute(action), None, self)
+            self.children.append(childNode)
+
