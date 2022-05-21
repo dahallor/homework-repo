@@ -1,9 +1,14 @@
+#Add a "create user" function
+#Verify a username/password is under a ceertain byte limit
+#verify only one person is logged in under one username at a time
+
+
 class Auth:
     def __init__(self):
         self.login = {
         "IsDiscourseBestProto?" : "ItDepends!121",
-        "WaterBottle" : "VodkaBottle",
-        "CyrptoBro121" : "loljk_it'sbad"
+        "CyrptoBro121" : "IFailedEcon101",
+        "test" : "test"
         }
 
     def _authenticate(self, verify, username, password):
@@ -31,7 +36,8 @@ class Auth:
             verify = self._authenticate(verify, username, password)
         return username
 
-        
+'''      
 if __name__ == '__main__':
     a = Auth()
     a.authenticate()
+'''
