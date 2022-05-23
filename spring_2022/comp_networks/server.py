@@ -9,64 +9,51 @@ ADDR = (SERVER, PORT)
 FORMAT = 'UTF-8'
 DISCONNECT = "EXIT" #look at DFA
 CHATROOM = "\general"
+ACTIVE_USERS = []
 
 #=========================================================Private Helper Methods================================================================
+def _decode_nonsession_PDU():
+    pass
 
-def _decode_NonSession_PDU(connection):
-    try:
-        head_len = connection.recv(HEADER).decode(FORMAT)
-        #pdb.set_trace()
-        head_len = int(len(head_len))
-        head = connection.recv(head_len).decode(FORMAT)
-        head = head.strip("\n")
-        header_info = head.split(";")
-        pdb.set_trace()
-        print(f"{header_info[2]} has entered the chat.")
-    except Exception:
-        raise Exception("Failed to Parse Header Info")
+def _decode_session_PDU():
+    msg = SERVER.recv()
 
-def _decode_Session_PDU(connection):
-    msg_len = connection.recv(HEADER).decode(FORMAT)
-    msg_len = int(msg_len)
-    msg = connection.recv(msg_len).decode(FORMAT)
-    pdb.set_trace()
-
-
-def _check_Connection(msg, connected):
-    if msg == DISCONNECT:
-        connected = False
-        print(f"\\blank has left the chat.")
-    else:
-        print(f"blank {msg}")
+def _check_disconnect(PDU_info, connected):
+    #TODO: create method to check if disconnect code is here
+    connected = True
     return connected
 
-#=============================================Main Public Methods================================================================================
 
-def client_handler(connection, address):
-    _decode_NonSession_PDU(connection)
+#============================================================Main Public Methods================================================================================
+def chatroom(conn, addr, header_info):
+    print(f"blank has entered the chat")
     connected = True
-    while connected:
-        try:
-            msg = _decode_Session_PDU(connection)
-            connected = _check_Connection(msg, connected)
-        except:
-            pass
-    connection.close()
+    #TODO: change this to whatever the username is
+    ACTIVE_USERS.append(header_info)
+    while connected == True:
+        PDU_info = _decode_session_PDU()
+        connected = _check_disconnect(PDU_info, connected)
+    conn.close()
+    #TODO: pop user from active users list
+
+def create_threads():
+    while True:
+        conn, addr = SERVER.accept()
+        header_info = _decode_nonsession_PDU()
+        new_thread = threading.Thread(target = chatroom, args = (conn, addr, header_info))
+        new_thread.start()
 
 def start_server():
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(ADDR)
-    server.listen()
-    print(f"[LISTENING]...\nWelcome to {CHATROOM}!")
-    while True:
-        conn, addr = server.accept()
-        thread = threading.Thread(target = client_handler, args = (conn, addr))
-        thread.start()
-        #print(f"num connections: {threading.active_count() -1}")
+    print("[BOOTING UP SERVER]...")
+    SERVER.bind(ADDR)
+    SERVER.listen()
+    print("[LISTENING]...")
+    create_threads()
+
+
 
 
 #=================================================================Main============================================================================
 
 if __name__ == '__main__':
-    print("[START SERVER]...")
     start_server()

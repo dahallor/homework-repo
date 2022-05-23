@@ -7,7 +7,7 @@ class Auth:
     def __init__(self):
         self.login = {
         "IsDiscourseBestProto?" : "ItDepends!121",
-        "CyrptoBro121" : "IFailedEcon101",
+        "CryptoBro121" : "IFailedEcon101",
         "test" : "test"
         }
 
