@@ -103,11 +103,17 @@ class Agent:
 
 
         matrix = self._convert_to_matrix(state_string)
-        Fx, Fy = self._get_current_position(matrix)
-        up, down, left, right, none, dy_up, dy_down, dx_left, dx_right = self._get_new_Q(Fx, Fy, matrix)
-        self._set_new_Q(up, down, left, right, none, dy_up, dy_down, dx_left, dx_right, Fx, Fy)
+        q_state = Q_State(state_string)
+        if self.train != None:
+            #use formula
+            self._add_to_QTable(q_state.key)
+            action = self._init_QLearning(q_state)
+        else:
+            #just return max value in q table
+            pass
 
-        pdb.set_trace()
+        #pdb.set_trace()
+        return action
         #return random.choice(State.ACTIONS)
 
     def _convert_to_matrix(self, state_string):
@@ -122,107 +128,46 @@ class Agent:
             current_step = prev_step + step
         return state_matrix
 
-    def _get_current_position(self, matrix):
-        for i in range(9):
-            try:
-                Fx = matrix[i].index("F")
-                Fy = i
-            except ValueError:
-                pass
-        return Fx, Fy
 
-    def _get_new_Q(self, Fx, Fy, matrix):
-        bad_states = ["~", ">", "<"]
-        #up
-        try:
-            dy_up = Fy - 1
-            square = matrix[dy_up][Fx]
-            if square in bad_states:
-                up = -10
-            else:
-                up = .5
-        except Exception:
-            up = 0
-            dy_up = None
+    def _add_to_QTable(self, key):
+        if key not in self.q:
+            self.q[key] = {
+            "u" : 0,
+            "d" : 0,
+            "l" : 0,
+            "r" : 0,
+            "_" : 0}
 
-        #down
-        try:
-            dy_down = Fy + 1
-            square = matrix[dy_down][Fx]
-            if square in bad_states:
-                down = -10
-            else:
-                down = .5
-        except Exception:
-            down = 0
-            dy_down = None
-
-        #right
-        try:
-            dx_right = Fx + 1
-            square = matrix[Fy][dx_right]
-            if square in bad_states:
-                right = -10
-            else:
-                right = .5
-        except Exception:
-            right = 0
-            dx_right = None
-
-        #left
-        try:
-            dx_left = Fx - 1
-            square = matrix[Fy][dx_left]
-            if square in bad_states:
-                left = -10
-            else:
-                left = .5
-        except Exception:
-            left = 0
-            dx_left = None
-
-        #null
-        try:
-            dx = Fx - 1
-            square = matrix[Fy][dx]
-            if square == ">":
-                none = -10
-            dx = Fx + 1
-            square = matrix[Fy][dx]
-            if square == "<":
-                none = -10
-            else:
-                none = .5
-        except Exception:
-            none = 0
-
-        return up, down, left, right, none, dy_up, dy_down, dx_left, dx_right
-        
-
-    def _set_new_Q(self, up, down, left, right, none, dy_up, dy_down, dx_left, dx_right, Fx, Fy):
-        alpha = .01
-        discount = .9
-        current_state = "S_" + str(Fy) + str(Fx)
-        Q_new_none = (1 - alpha) * (self.q[current_state]["none"])
-        
-
-    def initQTable(self):
-        x = 16
-        y = 9
-        for i in range(y):
-            for j in range(x):
-                state_name = "S_"
-                state_name += str(i)
-                state_name += ","
-                state_name += str(j)
-                if i != 0:
-                    self.q[state_name] = {
-                    "u" : 0,
-                    "d" : 0,
-                    "l" : 0,
-                    "r" : 0,
-                    "_" : 0}
-                else:
-                    self.q[state_name] = 10
         self.save()
+
+    def _get_max_state(self, key):
+        max_value = 0
+        directions = ["u", "d", "l", "r", "_"]
+        max_direction = random.choice(directions)
+        for direction in self.q[key]:
+            current_val = self.q[key][direction]
+            if current_val > max_value:
+                max_value = current_val
+                max_direction = direction
+
+
+        return max_value, max_direction
+
+    def _get_current_state_value(self, key, direction):
+        current_value = self.q[key][direction]
+        return current_value
+
+    def _set_new_q_value(self, key, direction, value):
+        self.q[key][direction] = value
+
+
+    def _init_QLearning(self, q_state):
+        alpha = .01
+        gamma = .9
+        max_value, max_direction = self._get_max_state(q_state.key)
+        current_value = self._get_current_state_value(q_state.key, max_direction)
+        new_value = (1-alpha) * current_value + alpha * (q_state.reward() + gamma * max_value)
+        self._set_new_q_value(q_state.key, max_direction, new_value)
+        return max_direction
+
 

@@ -2,13 +2,12 @@ import importlib
 import sys
 
 from agent import *
+from agent.agent import Q_State
 from util import Arguments
 
 if __name__ == '__main__':
 
     args = Arguments()
-    ag = Agent()
-    ag.initQTable()
 
     player = args.get('player', 'agent')
     screen = args.get('screen', 'medium')
