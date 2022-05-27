@@ -12,16 +12,16 @@ class GUI:
     def _layout(self):
         self.root.title("Discourse")
         #self.root.resizable(width=False, height=False)
-        self.root.configure(width=450, height=600, bg=self.BG_COLOR)
+        self.root.configure(width=650, height=800, bg=self.BG_COLOR)
 
         head = tk.Label(self.root, bg=self.BG_COLOR, fg=self.TEXT_COLOR, text="Chatroom Name Here", font=self.FONT, pady=10)
-        head.place(relwidth=1)
+        head.place(relwidth=.85)
 
-        #line = tk.Label(self.root, width=430, bg=self.BG_GRAY)
-        #line.place(relwidth=1, rely=.07, relheight=.012)
+        nav_bar = tk.Label(self.root, bg=self.BG_COLOR)
+        nav_bar.place(relwidth=.15, relheight=1)
 
         self.text = tk.Text(self.root, width=20, height=2, bg=self.BG_COLOR, fg=self.TEXT_COLOR, font=self.FONT, padx=5, pady=5)
-        self.text.place(relheight=.75, relwidth=1, rely=.075)
+        self.text.place(relheight=.75, relwidth=.85, rely=.075, relx=.15)
         self.text.configure(cursor="arrow", state=tk.DISABLED)
 
         scrollbar = tk.Scrollbar(self.text)
@@ -29,7 +29,7 @@ class GUI:
         scrollbar.configure(command=self.text.yview)
 
         input_widget = tk.Label(self.root, bg=self.BG_GRAY, height=80)
-        input_widget.place(relwidth=1, rely=.825)
+        input_widget.place(relwidth=.85, rely=.825, relx=.15)
 
         self.input_entry = tk.Entry(input_widget, bg="#2C3E50", fg=self.TEXT_COLOR, font=self.FONT)
         self.input_entry.place(relwidth=.74, relheight=.06, rely=.0075, relx=.01)
