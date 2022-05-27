@@ -1,13 +1,16 @@
 import tkinter as tk
+from client import *
 
 
-class GUI:
-    def __init__(self):
+class GUI(Client):
+    def __init__(self, client_socket, username):
+        super().__init__(client_socket, username)
         self.BG_GRAY = "#edf2f7"
         self.BG_COLOR = "#17202A"
         self.TEXT_COLOR = "#f7faf8"
         self.FONT = "Helvetica 14"
         self.FONT_BOLD = "Helvetica 13 bold"
+        self.username = username
 
     def _layout(self):
         self.root.title("Discourse")
@@ -41,20 +44,22 @@ class GUI:
 
     def _enter_msg(self, event):
         msg = self.input_entry.get()
-        self._insert_msg(msg, "Sample Username")
+        self._insert_msg(msg)
 
-    def _insert_msg(self, msg, username):
+    def _insert_msg(self, msg):
         if not msg:
             return
 
         else:
             self.input_entry.delete(0, tk.END)
-            formated_msg = f"{username}: {msg}\n"
+            formated_msg = f"{self.username}: {msg}\n"
             self.text.configure(state=tk.NORMAL)
             self.text.insert(tk.END, formated_msg)
             self.text.configure(state=tk.DISABLED)
 
             self.text.see(tk.END)
+
+            self.session_PDU(self.client_socket, self.USERNAME, msg)
 
     def run_GUI(self):
         self.root = tk.Tk()
@@ -63,8 +68,7 @@ class GUI:
 
         self.root.mainloop()
         #Put disconnect header code here
-        print("Exit")
 
 if __name__ == '__main__':
-    gui = GUI()
+    gui = GUI("debugman")
     gui.run_GUI()

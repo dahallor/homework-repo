@@ -8,7 +8,8 @@ class Auth:
         self.login = {
         "IsDiscourseBestProto?" : "ItDepends!121",
         "CryptoBro121" : "IFailedEcon101",
-        "test" : "test"
+        "test" : "test",
+        "debug" : "debug"
         }
 
     def _not_logged_in(self):
