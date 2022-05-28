@@ -25,7 +25,7 @@ def _encode_nonsession_PDU(client, PDU, code):
     for i in range(len(PDU)):
         head += str(PDU[i])
         head += DELIMIT
-    head += END
+    #head += END
     head = head.encode(FORMAT)
     head_len = len(head)
     send_head = str(head_len).encode(FORMAT)
@@ -46,7 +46,7 @@ def _session_header(client, PDU):
     for i in range(len(PDU)):
         head += str(PDU[i])
         head += DELIMIT
-    head += END
+    #head += END
     head = head.encode(FORMAT)
     head_len = len(head)
     send_head = str(head_len).encode(FORMAT)
@@ -61,6 +61,10 @@ def _session_body(client, msg):
     body_len += b' ' * (BODY - len(body_len))
     client.send(body_len)
     client.send(encoded_msg)
+
+def _welcome_msg():
+    print("\nHello there! Welcome to Discourse!")
+    print("Use the following commands:\n& notates a chatroom. \nTo switch to a different chatroom, type '&[CHATROOM NAME]'\nAll users can view available chatrooms. Use '&list' to list them.\nAccounts with admin privledges can add and remove chatrooms. Use '&add' and '&del' respectively\nTo close, type '&exit'\n")
 
 
 #================================================================Main Public Methods=======================================================================
@@ -93,8 +97,9 @@ if __name__ == '__main__':
         _encode_nonsession_PDU(client, PDU_header, code)
         PDU_header = _decode_nonsession_PDU(client, PDU_header, code)
     #Reponse code, chatroom, username, admin status       
-    PDU = ["Placeholder", "&general", PDU_header[1], PDU_header[2]]
-    print(PDU)
+    PDU = [31, "&general", PDU_header[1], PDU_header[2]]
+    #TODO: implement functionality of the welcome message
+    _welcome_msg()
     while True:
         msg = input(f"{PDU[1]} >> {PDU[2]}: ")
         encode_session_PDU(client, PDU, msg)

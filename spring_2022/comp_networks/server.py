@@ -11,6 +11,7 @@ FORMAT = 'UTF-8'
 DISCONNECT = "EXIT" #look at DFA
 CHATROOM = "&general"
 ACTIVE_USERS = []
+CONNECTIONS = {}
 MAX_VERSION = 1.0
 DELIMIT = ";"
 END = "\n\n"
@@ -37,7 +38,7 @@ def _encode_nonsession_PDU(PDU, conn):
     for i in range(len(PDU)):
         head += str(PDU[i])
         head += DELIMIT
-    head += END
+    #head += END
     head = head.encode(FORMAT)
     head_len = len(head)
     send_head = str(head_len).encode(FORMAT)
@@ -45,8 +46,20 @@ def _encode_nonsession_PDU(PDU, conn):
     conn.send(send_head)
     conn.send(head)
 
-def _decode_session_PDU(conn):
-    head = conn.recv(HEADER).decode(FORMAT)
+def _decode_session_PDU(conn, addr):
+    #If client terminal force quits, this puts exit response code in header
+    try:
+        head = conn.recv(HEADER).decode(FORMAT)
+    except ConnectionResetError:
+        PDU = CONNECTIONS[addr]
+        PDU.insert(0, 50)
+        head = ""
+        for i in range(len(PDU)):
+            head += str(PDU[i])
+            head += DELIMIT
+        PDU = [head, None]
+        return PDU
+    #Else, it continues handling like normal
     head_len = int(head)
     header = conn.recv(head_len).decode(FORMAT)
     msg = conn.recv(BODY).decode(FORMAT)
@@ -55,25 +68,23 @@ def _decode_session_PDU(conn):
     PDU = [header, message]
     return PDU
 
-def _check_disconnect(PDU_info, connected):
-    #TODO: create method to check if disconnect code is here
-    connected = True
-    return connected
-
 
 #============================================================Main Public Methods================================================================================
-def chatroom(conn, addr, header_info):
-    print(f"[SUCCSES] {header_info[1]} has entered the chat: {CHATROOM}")
+def chatroom(conn, addr, PDU):
+    print(f"[SUCCSES] {PDU[1]} has entered the chat: {CHATROOM}")
     connected = True
-    ACTIVE_USERS.append(header_info[1])
-    while connected == True:
-        PDU = _decode_session_PDU(conn)
+    CONNECTIONS[addr] = PDU[1:]
+    while int(PDU[0]) != 50:
+        PDU = _decode_session_PDU(conn, addr)
+        print(PDU)
         PDU_head = PDU[0].split(";")
         PDU_body = PDU[1]
         print(f"{PDU_head[1]} >> {PDU_head[2]}: {PDU_body}")
-        connected = _check_disconnect(PDU, connected)
+        PDU = PDU_head
+    print(f"[CLOSING] {PDU[1]} has left the chat: {CHATROOM}")
     conn.close()
-    #TODO: pop user from active users list
+    del CONNECTIONS[addr]
+    pdb.set_trace()
 
 def bad_connection(conn, header_info):
     print(f"[RETRYING] {header_info[1]} had bad connection request...")
