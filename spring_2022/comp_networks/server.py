@@ -8,15 +8,13 @@ PORT = 1719
 SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
 FORMAT = 'UTF-8'
-DISCONNECT = "EXIT" #look at DFA
 CHATROOM = "&general"
-ACTIVE_USERS = []
+ACTIVE_CHATROOMS = ["&general"]
 CONNECTIONS = {}
 MAX_VERSION = 1.0
 DELIMIT = ";"
-END = "\n\n"
 
-#=========================================================Private Helper Methods================================================================
+#==============================================================Private Helper Methods================================================================================
 def _check_version(PDU):
     if float(PDU[3]) == MAX_VERSION:
         PDU[0] = 21
@@ -24,6 +22,8 @@ def _check_version(PDU):
         PDU[0] = 22
         PDU[3] = MAX_VERSION
     return PDU
+
+#=============================================================Decode/Encode Methods=================================================================================
 
 def _decode_nonsession_PDU(conn):
     head = conn.recv(HEADER).decode(FORMAT)
@@ -74,6 +74,7 @@ def chatroom(conn, addr, PDU):
     print(f"[SUCCSES] {PDU[1]} has entered the chat: {CHATROOM}")
     connected = True
     CONNECTIONS[addr] = PDU[1:]
+    #While response code is not the exit response code, disseminate PDU to display messages and user info
     while int(PDU[0]) != 50:
         PDU = _decode_session_PDU(conn, addr)
         print(PDU)
@@ -97,13 +98,16 @@ def create_threads(server):
         header_info = _decode_nonsession_PDU(conn)
         _encode_nonsession_PDU(header_info, conn)
         match header_info[0]:
+            #Init Failure
             case 22:
                 bad_thread = threading.Thread(target = bad_connection, args = (conn, header_info))
                 bad_thread.start()
+            #Init Success
             case 21:
                 new_thread = threading.Thread(target = chatroom, args = (conn, addr, header_info))
                 new_thread.start()
             case _:
+                #This should never trigger, but match/case can act fickle if a catch-all case is not included
                 raise Exception("Init Check returning invalid value")
 
 def start_server():

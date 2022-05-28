@@ -64,7 +64,7 @@ def _session_body(client, msg):
 
 def _welcome_msg():
     print("\nHello there! Welcome to Discourse!")
-    print("Use the following commands:\n& notates a chatroom. \nTo switch to a different chatroom, type '&[CHATROOM NAME]'\nAll users can view available chatrooms. Use '&list' to list them.\nAccounts with admin privledges can add and remove chatrooms. Use '&add' and '&del' respectively\nTo close, type '&exit'\n")
+    print("Use the following commands:\n& notates a chatroom. \nTo switch to a different chatroom, type '&[CHATROOM NAME]'\n! notates a command\nAll users can view available chatrooms. Use '!list' to list them.\nAccounts with admin privledges can add and remove chatrooms. Use '!add' and '!del' respectively\nTo close, type '!exit'\n")
 
 
 #================================================================Main Public Methods=======================================================================
@@ -74,7 +74,27 @@ def encode_session_PDU(client, PDU, msg):
     _session_body(client, msg)
 
 
-
+def _decode_session_PDU(conn, addr):
+    #If client terminal force quits, this puts exit response code in header
+    try:
+        head = conn.recv(HEADER).decode(FORMAT)
+    except ConnectionResetError:
+        PDU = CONNECTIONS[addr]
+        PDU.insert(0, 50)
+        head = ""
+        for i in range(len(PDU)):
+            head += str(PDU[i])
+            head += DELIMIT
+        PDU = [head, None]
+        return PDU
+    #Else, it continues handling like normal
+    head_len = int(head)
+    header = conn.recv(head_len).decode(FORMAT)
+    msg = conn.recv(BODY).decode(FORMAT)
+    msg_len = int(msg)
+    message = conn.recv(BODY).decode(FORMAT)
+    PDU = [header, message]
+    return PDU
 
 #====================================================================Main============================================================================
 
