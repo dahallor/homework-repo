@@ -44,6 +44,20 @@ class Client:
         client_socket.send(body_len)
         client_socket.send(encoded_msg)
 
+    '''
+    def _decode_session_PDU(self):
+        head = self.client_socket.recv(HEADER).decode(FORMAT)
+        head_len = int(head)
+        header = self.client_socket.recv(head_len).decode(FORMAT)
+        msg = self.client_socket.recv(BODY).decode(FORMAT)
+        msg_len = int(msg)
+        message = self.client_socket.recv(BODY).decode(FORMAT)
+        PDU = [header, message]
+        return PDU
+    '''
+
+    
+
 
     #================================================================Main Public Methods=======================================================================
 

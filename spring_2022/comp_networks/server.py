@@ -24,6 +24,8 @@ def _decode_session_PDU(conn):
     msg = conn.recv(BODY).decode(FORMAT)
     msg_len = int(msg)
     message = conn.recv(BODY).decode(FORMAT)
+    print(head, head_len)
+    print(msg, msg_len)
     PDU = [header, message]
     return PDU
 
@@ -32,16 +34,36 @@ def _check_disconnect(PDU_info, connected):
     connected = True
     return connected
 
+def _broadcast_to_clients(PDU, conn):
+        head = PDU[0].encode(FORMAT)
+        head_len = len(head)
+        send_head = str(head_len).encode(FORMAT)
+        send_head += b' ' * (HEADER - len(send_head))
+        for user in ACTIVE_USERS:
+            print(user)
+            user.send(send_head)
+            user.send(head)
+
+        encoded_msg = PDU[1].encode(FORMAT)
+        msg_len = len(encoded_msg)
+        body_len = str(msg_len).encode(FORMAT)
+        body_len += b' ' * (BODY - len(body_len))
+        for user in ACTIVE_USERS:
+            user.send(body_len)
+            user.send(encoded_msg)
+        #pdb.set_trace()
+
+
 
 #============================================================Main Public Methods================================================================================
 def chatroom(conn, addr, header_info):
     print(f"blank has entered the chat")
     connected = True
     #TODO: change this to whatever the username is
-    ACTIVE_USERS.append(header_info)
     while connected == True:
         PDU = _decode_session_PDU(conn)
         print(f"{PDU[0]}: {PDU[1]}")
+        _broadcast_to_clients(PDU, conn)
         connected = _check_disconnect(PDU, connected)
     conn.close()
     #TODO: pop user from active users list
@@ -49,6 +71,7 @@ def chatroom(conn, addr, header_info):
 def create_threads(server):
     while True:
         conn, addr = server.accept()
+        ACTIVE_USERS.append(conn)
         header_info = _decode_nonsession_PDU()
         new_thread = threading.Thread(target = chatroom, args = (conn, addr, header_info))
         new_thread.start()

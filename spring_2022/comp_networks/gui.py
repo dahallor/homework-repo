@@ -1,5 +1,12 @@
 import tkinter as tk
+import socket
+import pdb
+import threading
 from client import *
+
+HEADER = 64
+BODY = 4096
+FORMAT = 'UTF-8'
 
 
 class GUI(Client):
@@ -11,6 +18,7 @@ class GUI(Client):
         self.FONT = "Helvetica 14"
         self.FONT_BOLD = "Helvetica 13 bold"
         self.username = username
+        self.own_msg = True
 
     def _layout(self):
         self.root.title("Discourse")
@@ -39,18 +47,24 @@ class GUI(Client):
         self.input_entry.focus()
         self.input_entry.bind("<Return>", self._enter_msg)
 
-        enter_button = tk.Button(input_widget, text="Enter", font=self.FONT_BOLD, width=20, bg=self.BG_GRAY, command=lambda: self._enter_msg(None))
+        enter_button = tk.Button(input_widget, text="Enter", font=self.FONT_BOLD, width=20, bg=self.BG_GRAY, command=lambda: self._enter_msg(None, True))
         enter_button.place(relx=.77, rely=.008, relheight=.06, relwidth=.22)
 
-    def _enter_msg(self, event):
-        msg = self.input_entry.get()
-        self._insert_msg(msg)
+    def _enter_msg(self, event, own_msg):
+        if own_msg == True:
+            msg = self.input_entry.get()
+            self.session_PDU(self.client_socket, self.USERNAME, msg)
+            PDU = self._decode_session_PDU()
+            msg = PDU[1]
+            self._insert_msg(self.username, msg)
 
-    def _insert_msg(self, msg):
+    def _insert_msg(self, username, msg):
         if not msg:
             return
 
         else:
+
+            #pdb.set_trace()
             self.input_entry.delete(0, tk.END)
             formated_msg = f"{self.username}: {msg}\n"
             self.text.configure(state=tk.NORMAL)
@@ -59,14 +73,41 @@ class GUI(Client):
 
             self.text.see(tk.END)
 
-            self.session_PDU(self.client_socket, self.USERNAME, msg)
+
+    def _decode_session_PDU(self):
+        try:
+            head = self.client_socket.recv(HEADER).decode(FORMAT)
+            print(self.client_socket)
+            head_len = int(head)
+            header = self.client_socket.recv(head_len).decode(FORMAT)
+            msg = self.client_socket.recv(BODY).decode(FORMAT)
+            msg_len = int(msg)
+            message = self.client_socket.recv(BODY).decode(FORMAT)
+            print(head, head_len)
+            print(msg, msg_len)
+            PDU = [header, message]
+        except Exception:
+            return None
+        return PDU
+
+    def _update(self):
+        print("in update function")
+        PDU = self._decode_session_PDU()
+        print(PDU)
+        if PDU != None:
+            self._insert_msg(PDU[0], PDU[1])
+        self._update()
 
     def run_GUI(self):
         self.root = tk.Tk()
 
         self._layout()
+        check_msg_thread = threading.Thread(target=self._update)
+        check_msg_thread.start()
+        print("main thread")
 
         self.root.mainloop()
+        check_msg_thread.join()
         #Put disconnect header code here
 
 if __name__ == '__main__':
