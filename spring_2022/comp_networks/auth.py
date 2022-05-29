@@ -12,6 +12,7 @@ class Auth:
         "debug" : ["debug", True]
         }
 
+
     def _not_logged_in(self):
         #TODO: place some code here
         pass
