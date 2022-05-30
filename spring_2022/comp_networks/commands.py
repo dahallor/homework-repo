@@ -1,8 +1,9 @@
-from server import *
 
-class Cmds(Server):
-    def __init__(self):
+
+class Cmds:
+    def __init__(self, server):
         super().__init__()
+        self.server = server
 
     def _load_chatlog(self, chatroom):
         for log in self.CHATLOG:
@@ -21,11 +22,11 @@ class Cmds(Server):
             match PDU_body:
                 case "!add":
                     if chatroom_delimiter == "&":
-                        self.ACTIVE_CHATROOMS.append(PDU_body[1])
+                        self.server.ACTIVE_CHATROOMS.append(PDU_body[1])
                         print(f"{PDU_body[1]} added!")
                 case "!del":
                     if chatroom_delimiter == "&":
-                        self.ACTIVE_CHATROOMS.remove(PDU_body[1])
+                        self.server.ACTIVE_CHATROOMS.remove(PDU_body[1])
                         print(f"{PDU_body[1]} removed!")
                 case _:
                     raise Exception("Admin command issue")
@@ -34,11 +35,11 @@ class Cmds(Server):
                 case "!switch":
                     if chatroom_delimiter == "&":
                         PDU_header[1] = PDU_body[1]
-                        print(self.CLEAR_SCREEN)
+                        print(self.server.CLEAR_SCREEN)
                         print(f"Switched to {PDU_body[1]}")
                         self._load_chatlog(PDU_body[1])
                 case "!list":
-                    for chatroom in self.ACTIVE_CHATROOMS:
+                    for chatroom in self.server.ACTIVE_CHATROOMS:
                         print(f"{chatroom}")
                 case "!exit":
                     PDU_header[0] = code.actions["Exit"]

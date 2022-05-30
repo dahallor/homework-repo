@@ -1,7 +1,6 @@
-from server import *
 
 
-class Auth(Server):
+class Auth:
     def __init__(self):
         super().__init__()
         self.login = {

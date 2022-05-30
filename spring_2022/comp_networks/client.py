@@ -6,6 +6,7 @@ from architecture import Architecture
 from auth import *
 from response_codes import *
 from versions import *
+from gui import *
 
 
 class Client(Architecture):
@@ -95,18 +96,20 @@ class Client(Architecture):
 
     #================================================================Main Public Methods=======================================================================
 
-    def rec_loop(self, v, code, client_socket):
+    def rec_loop(self, v, code, gui, client_socket):
         while True:
+            print("in rec loop")
             PDU = self._decode_session_PDU(client_socket)
             PDU_head = PDU[0].split(";")
             PDU_body = PDU[1]
             print(self.user, PDU_head)
             if PDU_head[2] != self.user:
-                print(f"{PDU_head[2]} >> {PDU_body}: ")
+                gui._enter_others_msg(PDU_head[2], PDU_body)
+                #print(f"{PDU_head[2]} >> {PDU_body}: ")
             PDU = PDU_head
 
-    def send_loop(self, v, code, PDU, client_socket):
-        listen_thread = threading.Thread(target=self.rec_loop, args=(v, code, client_socket))
+    def send_loop(self, v, code, gui, PDU, client_socket):
+        listen_thread = threading.Thread(target=self.rec_loop, args=(v, code, gui, client_socket))
         listen_thread.start()
         while True:
             msg = input(f"{PDU[1]} >> {PDU[2]}: ")
@@ -114,7 +117,7 @@ class Client(Architecture):
 
 
 
-    def start_client(self, auth, code, v):
+    def start_client(self, auth, code, v, gui):
         PDU_header = []
 
         auth.authenticate(PDU_header, code)
@@ -133,7 +136,8 @@ class Client(Architecture):
 
         #TODO: implement functionality of the welcome message
         self._welcome_msg()
-        self.send_loop(v, code, PDU, client_socket)
+        gui.run_GUI(v, code, PDU, client_socket)
+
 
 
 
@@ -145,8 +149,9 @@ if __name__ == '__main__':
     code = Codes()
     v = Versions()
     c = Client()
+    gui = GUI(c)
 
-    c.start_client(auth, code, v)
+    c.start_client(auth, code, v, gui)
 
 
 

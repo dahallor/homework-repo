@@ -172,5 +172,5 @@ if __name__ == '__main__':
     v = Versions()
     code = Codes()
     s = Server()
-    commands = Cmds()
+    commands = Cmds(s)
     s.start_server(v, code, commands)
