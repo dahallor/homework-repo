@@ -18,13 +18,15 @@ class Client(Architecture):
 
 #===================================================================Private Helper Methods=================================================================
     def _eval_response_code(self, code, v, PDU, msg):
+        PDU[0] = code.actions["Push MSG To Server"]
         if msg in v.admin_permissions[self.active_version] and PDU[3] == True:
             PDU[0] = code.actions["Admin Level Request"]
         if msg in v.versions[self.active_version] and msg not in v.admin_permissions[self.active_version] and msg != "!exit":
             PDU[0] = code.actions["Nonadmin Command"]
         if msg == "!exit":
             PDU[0] = code.actions["Exit"]
-        return PDU, msg
+        print(PDU)
+        return PDU
         
     def _encode_nonsession_PDU(self, client_socket, PDU, code):
         head = ""
@@ -47,13 +49,11 @@ class Client(Architecture):
         return PDU
 
     def _encode_session_PDU(self, v, code, client_socket, PDU, msg):
-        if len(msg) > 0: 
-            if msg[0] == "!":
-                PDU = self._eval_response_code(code, v, PDU, msg)
-            else:
-                PDU[0] = code.actions["Push MSG To Server"]
+        print(f"encodeing: {PDU}")
+        PDU = self._eval_response_code(code, v, PDU, msg)
         self._session_header(client_socket, PDU)
         self._session_body(client_socket, msg)
+
 
     def _decode_session_PDU(self, client_socket):
         head = client_socket.recv(self.HEADER).decode(self.FORMAT)
@@ -67,6 +67,7 @@ class Client(Architecture):
         
 
     def _session_header(self, client_socket, PDU):
+        print(f"session header: {PDU}")
         head = ""
         for i in range(len(PDU)):
             head += str(PDU[i])

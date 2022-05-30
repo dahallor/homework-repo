@@ -12,7 +12,7 @@ class Server(Architecture):
     def __init__(self):
         super().__init__()
         self.CHATROOM = "&general"
-        self.ACTIVE_CHATROOMS = ["&general"]
+        self.ACTIVE_CHATROOMS = ["&general", "&private"]
         self.ACTIVE_USERS = []
         self.ACTIVE_SOCKETS = []
         self.CHATLOG = []
@@ -79,7 +79,8 @@ class Server(Architecture):
         return PDU
 
     def _encode_session_PDU(self, code, commands, PDU, msg):
-        PDU = commands.special_cmds(code, PDU, msg)
+        PDU, msg = commands.special_cmds(code, PDU, msg)
+        print(f'encoding: {PDU} {msg}')
         self._session_header(PDU)
         self._session_body(msg)
 
@@ -118,7 +119,6 @@ class Server(Architecture):
             PDU_head = PDU[0].split(";")
             PDU_body = PDU[1]
             print(f"chatroom loop: {PDU} {PDU_head} {PDU_body}")
-            PDU_head  = commands.special_cmds(code, PDU_head, PDU_body)
             self._encode_session_PDU(code, commands, PDU_head, PDU_body)
             print(f"{PDU_head[1]} >> {PDU_head[2]}: {PDU_body}")
             log_data = [PDU_head[1], PDU_head[2], PDU_body]

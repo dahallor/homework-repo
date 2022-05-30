@@ -72,7 +72,6 @@ class GUI:
             PDU_body = PDU[1]
             if PDU_head[2] != self.client.user:
                 self._enter_others_msg(PDU_head[2], PDU_body)
-                #print(f"{PDU_head[2]} >> {PDU_body}: ")
             PDU = PDU_head
 
 
