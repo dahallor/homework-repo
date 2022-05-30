@@ -1,6 +1,6 @@
 class Versions:
     def __init__(self):
-        self.versions = {1.0 : ["&", "!add", "!del", "!list"], 1.1 : "What's my job? Debugging purposes"}
+        self.versions = {1.0 : ["!switch", "!add", "!del", "!list", "!exit"], 1.1 : "What's my job? Debugging purposes"}
         self.admin_permissions = {1.0 : ["!add", "!del"]}
 
     '''

@@ -1,9 +1,10 @@
 import tkinter as tk
-from client import *
+from server import *
 
 
-class GUI(Client):
+class GUI(Server):
     def __init__(self):
+        super().__init__()
         self.BG_GRAY = "#ABB2B9"
         self.BG_COLOR = "#17202A"
         self.TEXT_COLOR = "#EAECEE"
@@ -15,16 +16,16 @@ class GUI(Client):
         self.root.geometry('650x800')
 
     def _elements(self):
-        self.chatroom_name_frame = tk.Frame(self.root, bd=2, width=645, height=100, relief="groove")
-        self.chatroom_name_label = tk.Label(self.chatroom_name_frame, text="It's working")
+        self.chatroom_name_frame = tk.Frame(self.root, bd=2, width=645, height=100, relief="groove", bg=self.BG_COLOR)
+        self.chatroom_name_label = tk.Label(self.chatroom_name_frame, text="It's working", bg=self.BG_COLOR, fg=self.TEXT_COLOR)
         
-        self.chatlog_frame = tk.Frame(self.root, bd=2, width=645, height=550, relief="groove", bg="white")
+        self.chatlog_frame = tk.Frame(self.root, bd=2, width=645, height=550, relief="groove", bg=self.BG_COLOR)
         self.chatlog_label = tk.Label(self.chatlog_frame, text="It's working")
 
         self.input_frame = tk.Frame(self.root, bd=2, width=645, height=150, relief="groove")
         #self.input_label = tk.Label(self.input_frame)
-        self.input_field = tk.Entry(self.input_frame)
-        self.enter_button = tk.Button(self.input_frame, text="Enter", command=self._enter_msg, bg=self.BG_COLOR, fg=self.TEXT_COLOR)
+        self.input_field = tk.Entry(self.input_frame, bg="gray", fg=self.TEXT_COLOR)
+        self.enter_button = tk.Button(self.input_frame, text="Enter", command=self._enter_msg, bg=self.BG_COLOR, fg=self.TEXT_COLOR, pady=10)
         
 
     def _grid(self):
@@ -36,8 +37,8 @@ class GUI(Client):
 
         #self.input_label.place(anchor="c")
         self.input_frame.pack()
-        self.input_field.place(width=620, height=145, anchor="w")
-        self.enter_button.place(anchor="e")
+        self.input_field.place(width=600, height=145, anchor="w")
+        self.enter_button.place(relx=1, width=45, height=145, anchor="e")
 
         
         

@@ -5,6 +5,7 @@ from architecture import Architecture
 from versions import *
 from response_codes import *
 from auth import *
+from commands import *
 
 
 class Server(Architecture):
@@ -17,8 +18,9 @@ class Server(Architecture):
         self.CHATLOG = []
         self.CONNECTIONS = {}
         self.MAX_VERSION = 1.0
+        self.CLEAR_SCREEN = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
 
-    #==============================================================Private Helper Methods================================================================================
+#==============================================================Private Helper Methods================================================================================
     def _check_version(self, PDU):
         if float(PDU[3]) == self.MAX_VERSION:
             PDU[0] = 21
@@ -27,7 +29,7 @@ class Server(Architecture):
             PDU[3] = self.MAX_VERSION
         return PDU
 
-    #=============================================================Decode/Encode Methods=================================================================================
+#=============================================================Decode/Encode Methods=================================================================================
 
     def _decode_nonsession_PDU(self, conn):
         head = conn.recv(self.HEADER).decode(self.FORMAT)
@@ -42,7 +44,8 @@ class Server(Architecture):
         head = ""
         for i in range(len(PDU)):
             head += str(PDU[i])
-            head += self.DELIMIT
+            if i != len(PDU)-1:
+                head += self.DELIMIT
         head = head.encode(self.FORMAT)
         head_len = len(head)
         send_head = str(head_len).encode(self.FORMAT)
@@ -60,7 +63,8 @@ class Server(Architecture):
             head = ""
             for i in range(len(PDU)):
                 head += str(PDU[i])
-                head += self.DELIMIT
+                if i != len(PDU)-1:
+                    head += self.DELIMIT
             PDU = [head, None]
             return PDU
 
@@ -69,11 +73,13 @@ class Server(Architecture):
         header = conn.recv(head_len).decode(self.FORMAT)
         msg = conn.recv(self.BODY).decode(self.FORMAT)
         msg_len = int(msg)
-        message = conn.recv(self.BODY).decode(self.FORMAT)
+        message = conn.recv(msg_len).decode(self.FORMAT)
         PDU = [header, message]
+        print(f"decode session: {PDU} {header} {message}")
         return PDU
 
-    def _encode_session_PDU(self, PDU, msg):
+    def _encode_session_PDU(self, code, commands, PDU, msg):
+        PDU = commands.special_cmds(code, PDU, msg)
         self._session_header(PDU)
         self._session_body(msg)
 
@@ -82,7 +88,8 @@ class Server(Architecture):
         PDU[0] = 32
         for i in range(len(PDU)):
             head += str(PDU[i])
-            head += self.DELIMIT
+            if i != len(PDU)-1:
+                head += self.DELIMIT
         head = head.encode(self.FORMAT)
         head_len = len(head)
         send_head = str(head_len).encode(self.FORMAT)
@@ -100,20 +107,19 @@ class Server(Architecture):
             socket.send(body_len)
             socket.send(encoded_msg)
 
-    #============================================================Main Public Methods================================================================================
-    def chatroom(self, v, code, conn, addr, PDU):
+#============================================================Main Public Methods================================================================================
+    def chatroom(self, v, code, commands, conn, addr, PDU):
         print(f"[SUCCSES] {PDU[1]} has entered the chat: {self.CHATROOM}")
         self.CONNECTIONS[addr] = PDU[1:]
         self.ACTIVE_SOCKETS.append(conn)
         #While response code is not the exit response code, disseminate PDU to display messages and user info
-        while int(PDU[0]) != 50:
+        while int(PDU[0]) != code.actions["Exit"]:
             PDU = self._decode_session_PDU(conn, addr)
             PDU_head = PDU[0].split(";")
             PDU_body = PDU[1]
-            if PDU_head[0] == code.actions["Admin Level Request"]:
-                #Add method here to check admin status
-                pass
-            self._encode_session_PDU(PDU_head, PDU_body)
+            print(f"chatroom loop: {PDU} {PDU_head} {PDU_body}")
+            PDU_head  = commands.special_cmds(code, PDU_head, PDU_body)
+            self._encode_session_PDU(code, commands, PDU_head, PDU_body)
             print(f"{PDU_head[1]} >> {PDU_head[2]}: {PDU_body}")
             log_data = [PDU_head[1], PDU_head[2], PDU_body]
             self.CHATLOG.append(log_data)
@@ -130,7 +136,7 @@ class Server(Architecture):
         conn.close()
 
 
-    def create_threads(self, v, code, server_socket):
+    def create_threads(self, v, code, commands, server_socket):
         while True:
             conn, addr = server_socket.accept()
             header_info = self._decode_nonsession_PDU(conn)
@@ -143,19 +149,19 @@ class Server(Architecture):
                 #Init Success
                 case 21:
                     self.ACTIVE_USERS.append(header_info[1])
-                    new_thread = threading.Thread(target = self.chatroom, args = (v, code, conn, addr, header_info))
+                    new_thread = threading.Thread(target = self.chatroom, args = (v, code, commands, conn, addr, header_info))
                     new_thread.start()
                 case _:
                     #This should never trigger, but match/case can act fickle if a catch-all case is not included
                     raise Exception("Init Check returning invalid value")
 
-    def start_server(self, v, code):
+    def start_server(self, v, code, commands):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("[BOOTING UP SERVER]...")
         server_socket.bind(self.ADDR)
         server_socket.listen()
         print("[LISTENING]...")
-        self.create_threads(v, code, server_socket)
+        self.create_threads(v, code, commands, server_socket)
 
 
 
@@ -166,4 +172,5 @@ if __name__ == '__main__':
     v = Versions()
     code = Codes()
     s = Server()
-    s.start_server(v, code)
+    commands = Cmds()
+    s.start_server(v, code, commands)

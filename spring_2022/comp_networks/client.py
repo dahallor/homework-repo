@@ -1,6 +1,5 @@
 import socket
-import select
-import errno
+import threading
 import sys
 import pdb
 from architecture import Architecture
@@ -13,14 +12,25 @@ class Client(Architecture):
     def __init__(self):
         super().__init__()
         self.user = ""
+        self.active_version = 0
 
 
-    #===================================================================Private Helper Methods=================================================================
+#===================================================================Private Helper Methods=================================================================
+    def _eval_response_code(self, code, v, PDU, msg):
+        if msg in v.admin_permissions[self.active_version] and PDU[3] == True:
+            PDU[0] = code.actions["Admin Level Request"]
+        if msg in v.versions[self.active_version] and msg not in v.admin_permissions[self.active_version] and msg != "!exit":
+            PDU[0] = code.actions["Nonadmin Command"]
+        if msg == "!exit":
+            PDU[0] = code.actions["Exit"]
+        return PDU, msg
+        
     def _encode_nonsession_PDU(self, client_socket, PDU, code):
         head = ""
         for i in range(len(PDU)):
             head += str(PDU[i])
-            head += self.DELIMIT
+            if i != len(PDU)-1:
+                head += self.DELIMIT
         head = head.encode(self.FORMAT)
         head_len = len(head)
         send_head = str(head_len).encode(self.FORMAT)
@@ -35,7 +45,12 @@ class Client(Architecture):
         PDU = header.split(";")
         return PDU
 
-    def _encode_session_PDU(self, client_socket, PDU, msg):
+    def _encode_session_PDU(self, v, code, client_socket, PDU, msg):
+        if len(msg) > 0: 
+            if msg[0] == "!":
+                PDU = self._eval_response_code(code, v, PDU, msg)
+            else:
+                PDU[0] = code.actions["Push MSG To Server"]
         self._session_header(client_socket, PDU)
         self._session_body(client_socket, msg)
 
@@ -45,7 +60,7 @@ class Client(Architecture):
         header = client_socket.recv(head_len).decode(self.FORMAT)
         msg = client_socket.recv(self.BODY).decode(self.FORMAT)
         msg_len = int(msg)
-        message = client_socket.recv(self.BODY).decode(self.FORMAT)
+        message = client_socket.recv(msg_len).decode(self.FORMAT)
         PDU = [header, message]
         return PDU
         
@@ -54,11 +69,13 @@ class Client(Architecture):
         head = ""
         for i in range(len(PDU)):
             head += str(PDU[i])
-            head += self.DELIMIT
+            if i != len(PDU)-1:
+                head += self.DELIMIT
         head = head.encode(self.FORMAT)
         head_len = len(head)
         send_head = str(head_len).encode(self.FORMAT)
         send_head += b' ' * (self.HEADER - len(send_head))
+        print(f"sending: {head}")
         client_socket.send(send_head)
         client_socket.send(head)
 
@@ -67,29 +84,34 @@ class Client(Architecture):
         msg_len = len(encoded_msg)
         body_len = str(msg_len).encode(self.FORMAT)
         body_len += b' ' * (self.BODY - len(body_len))
+        print(f"sending body: {encoded_msg}")
         client_socket.send(body_len)
         client_socket.send(encoded_msg)
 
     def _welcome_msg(self):
         print("\nHello there! Welcome to Discourse!")
-        print("Use the following commands:\n& notates a chatroom. \nTo switch to a different chatroom, type '&[CHATROOM NAME]'\n! notates a command\nAll users can view available chatrooms. Use '!list' to list them.\nAccounts with admin privledges can add and remove chatrooms. Use '!add' and '!del' respectively\nTo close, type '!exit'\n")
+        print("Use the following commands:\n& notates a chatroom. \n! notates a command\nTo switch to a new chatroom, type '!switch &[CHATROOM]'\nAll users can view available chatrooms. Use '!list' to list them.\nAccounts with admin privledges can add and remove chatrooms. Use '!add' and '!del' respectively\nTo close, type '!exit'\n")
 
 
     #================================================================Main Public Methods=======================================================================
 
-
-
-    def main_loop(self, PDU, client_socket):
+    def rec_loop(self, v, code, client_socket):
         while True:
-            print(PDU)
-            msg = input(f"{PDU[1]} >> {PDU[2]}: ")
-            self._encode_session_PDU(client_socket, PDU, msg)
             PDU = self._decode_session_PDU(client_socket)
             PDU_head = PDU[0].split(";")
             PDU_body = PDU[1]
+            print(self.user, PDU_head)
             if PDU_head[2] != self.user:
                 print(f"{PDU_head[2]} >> {PDU_body}: ")
             PDU = PDU_head
+
+    def send_loop(self, v, code, PDU, client_socket):
+        listen_thread = threading.Thread(target=self.rec_loop, args=(v, code, client_socket))
+        listen_thread.start()
+        while True:
+            msg = input(f"{PDU[1]} >> {PDU[2]}: ")
+            self._encode_session_PDU(v, code, client_socket, PDU, msg)
+
 
 
     def start_client(self, auth, code, v):
@@ -107,10 +129,11 @@ class Client(Architecture):
         #Reponse code, chatroom, username, admin status       
         PDU = [31, "&general", PDU_header[1], PDU_header[2]]
         self.user = PDU[2]
+        self.active_version = float(PDU_header[3])
 
         #TODO: implement functionality of the welcome message
         self._welcome_msg()
-        self.main_loop(PDU, client_socket)
+        self.send_loop(v, code, PDU, client_socket)
 
 
 

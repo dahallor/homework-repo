@@ -1,10 +1,9 @@
-#Add a "create user" function
-#Verify a username/password is under a ceertain byte limit
-#verify only one person is logged in under one username at a time
+from server import *
 
 
-class Auth:
+class Auth(Server):
     def __init__(self):
+        super().__init__()
         self.login = {
         "IsDiscourseBestProto?" : ["ItDepends!121", True],
         "CryptoBro121" : ["IFailedEcon101", False],
