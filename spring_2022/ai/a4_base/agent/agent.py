@@ -2,6 +2,7 @@ import json
 import os
 import random
 import pdb
+import math
 
 from .state import State
 
@@ -14,6 +15,7 @@ class Q_State(State):
 
         # key stores the state's key string (see notes in _compute_key())
         self.key = self._compute_key()
+
 
     def _compute_key(self):
         '''
@@ -28,9 +30,35 @@ class Q_State(State):
         # this simple key uses the 3 object characters above the frog
         # and combines them into a key string
         return ''.join([
+            #3 squares 1 row above F
             self.get(self.frog_x - 1, self.frog_y - 1) or '_',
             self.get(self.frog_x, self.frog_y - 1) or '_',
             self.get(self.frog_x + 1, self.frog_y - 1) or '_',
+            '|',
+            #3 squarees in the 3 rows above F
+            self.get(self.frog_x, self.frog_y - 1) or '_',
+            self.get(self.frog_x, self.frog_y - 2) or '_',
+            self.get(self.frog_x, self.frog_y - 3) or '_',
+            '|',
+            #3 squares 1 row below F
+            self.get(self.frog_x - 1, self.frog_y + 1) or '_',
+            self.get(self.frog_x, self.frog_y + 1) or '_',
+            self.get(self.frog_x + 1, self.frog_y + 1) or '_',
+            '|',
+            #3 squarees in the 3 rows below F
+            self.get(self.frog_x, self.frog_y + 1) or '_',
+            self.get(self.frog_x, self.frog_y + 2) or '_',
+            self.get(self.frog_x, self.frog_y + 3) or '_',
+            '|',
+            #3 squares to left of F
+            self.get(self.frog_x - 1, self.frog_y) or '_',
+            self.get(self.frog_x - 2, self.frog_y) or '_',
+            self.get(self.frog_x - 3, self.frog_y) or '_',
+            '|',
+            #3 squares to right of F
+            self.get(self.frog_x + 1, self.frog_y) or '_',
+            self.get(self.frog_x + 2, self.frog_y) or '_',
+            self.get(self.frog_x + 3, self.frog_y) or '_',
         ])
 
     def reward(self):
@@ -63,6 +91,9 @@ class Agent:
         # (you likely don't need to use or change this)
         self.path = os.path.join(os.path.dirname(
             os.path.realpath(__file__)), 'train', self.name + '.json')
+
+        #how many steps until goal is reached to raise discount factor by. Resets to 0 when goal is reached
+        self.current_path = []
 
         self.load()
 
@@ -101,13 +132,12 @@ class Agent:
         the code to implement Q-learning within the agent.
         '''
 
-
-        matrix = self._convert_to_matrix(state_string)
         q_state = Q_State(state_string)
         if self.train != None:
             #use formula
             self._add_to_QTable(q_state.key)
-            action = self._init_QLearning(q_state)
+            action = self._build_path(q_state, q_state.key)
+            self._QLearning(q_state)
         else:
             #just return max value in q table
             pass
@@ -115,18 +145,6 @@ class Agent:
         #pdb.set_trace()
         return action
         #return random.choice(State.ACTIONS)
-
-    def _convert_to_matrix(self, state_string):
-        step = 16
-        prev_step = 0
-        current_step = 16
-        state_matrix = []
-        for i in range(9):
-            slice = state_string[prev_step:current_step]
-            state_matrix.append(slice)
-            prev_step = current_step + 1
-            current_step = prev_step + step
-        return state_matrix
 
 
     def _add_to_QTable(self, key):
@@ -140,34 +158,62 @@ class Agent:
 
         self.save()
 
-    def _get_max_state(self, key):
-        max_value = 0
-        directions = ["u", "d", "l", "r", "_"]
-        max_direction = random.choice(directions)
-        for direction in self.q[key]:
-            current_val = self.q[key][direction]
-            if current_val > max_value:
-                max_value = current_val
-                max_direction = direction
+    def _max_action(self, q_state, key):
+        max_val = -math.inf
+        max_move = ""
+        for i in range(len(q_state.ACTIONS)):
+            a = q_state.ACTIONS[i]
+            val = self.q[key][a]
+            if val > max_val:
+                max_val = val
+                max_move = a
+        return max_val, max_move
+
+    def _build_path(self, q_state, key):
+        probability = random.random()
+        if probability <= .4:
+            #explore
+            action = random.choice(q_state.ACTIONS)
+        else:
+            #exploit
+            val, action = self._max_action(q_state, key)
+        temp = []
+        temp.append(q_state.key)
+        temp.append(action)
+        temp.append(q_state.reward())
+        self.current_path.append(temp)
+        
+        return action
 
 
-        return max_value, max_direction
-
-    def _get_current_state_value(self, key, direction):
-        current_value = self.q[key][direction]
-        return current_value
-
-    def _set_new_q_value(self, key, direction, value):
-        self.q[key][direction] = value
-
-
-    def _init_QLearning(self, q_state):
-        alpha = .01
+    def _QLearning(self, q_state):
+        alpha = .1
         gamma = .9
-        max_value, max_direction = self._get_max_state(q_state.key)
-        current_value = self._get_current_state_value(q_state.key, max_direction)
-        new_value = (1-alpha) * current_value + alpha * (q_state.reward() + gamma * max_value)
-        self._set_new_q_value(q_state.key, max_direction, new_value)
-        return max_direction
+        if len(self.current_path) >= 2:
+            t = len(self.current_path)
+
+            #value function
+            reward = q_state.reward()
+            sum = 0
+            for i in range(t-1, -1, -1):
+                sum += math.pow(gamma, t) * self.current_path[i][2]
+                t -= 1
+
+
+            for i in range(len(self.current_path) -1, 0, -1):
+                key = self.current_path[i][0]
+                v, a = self._max_action(q_state, key)
+                q_value = (1-alpha) * sum + alpha * (reward + gamma * v)
+                self.q[self.current_path[i-1][0]][self.current_path[i-1][1]] = q_value
+
+            #pdb.set_trace()
+            if q_state.is_done == True:
+                self.current_path = []
+
+
+
+
+
+
 
 
