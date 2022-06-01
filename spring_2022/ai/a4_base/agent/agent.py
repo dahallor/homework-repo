@@ -127,7 +127,11 @@ class Agent:
             val = max(self.q[q_state.key])
             index = self.q[q_state.key].index(val)
             action = q_state.ACTIONS[index]
-
+        #So it doesn't just hope back and forth on home row
+        if q_state.get(q_state.frog_x - 1, q_state.frog_y - 1) == "-" or q_state.get(q_state.frog_x - 1, q_state.frog_y - 1) == "_":
+            if q_state.get(q_state.frog_x, q_state.frog_y - 1) =="-":
+                if q_state.get(q_state.frog_x + 1, q_state.frog_y - 1) == "-" or q_state.get(q_state.frog_x + 1, q_state.frog_y - 1) == '_':
+                    action = "u"
         #pdb.set_trace()
         return action
         #return random.choice(State.ACTIONS)
