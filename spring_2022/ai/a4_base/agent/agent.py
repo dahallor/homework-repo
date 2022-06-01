@@ -127,12 +127,10 @@ class Agent:
             val = max(self.q[q_state.key])
             index = self.q[q_state.key].index(val)
             action = q_state.ACTIONS[index]
-        #So it doesn't just hope back and forth on home row
-        if q_state.get(q_state.frog_x - 1, q_state.frog_y - 1) == "-" or q_state.get(q_state.frog_x - 1, q_state.frog_y - 1) == "_":
-            if q_state.get(q_state.frog_x, q_state.frog_y - 1) =="-":
-                if q_state.get(q_state.frog_x + 1, q_state.frog_y - 1) == "-" or q_state.get(q_state.frog_x + 1, q_state.frog_y - 1) == '_':
-                    action = "u"
-        #pdb.set_trace()
+
+        #Helper code
+
+        pdb.set_trace()
         return action
         #return random.choice(State.ACTIONS)
 
@@ -150,21 +148,42 @@ class Agent:
 
     def _build_path(self, q_state, key):
         probability = random.random()
+        search_type = ""
         if probability <= .3:
             #explore
+            search_type = "explore"
             action = random.choice(q_state.ACTIONS)
         else:
             #exploit
+            search_type = "exploit"
             index = self._max_action(q_state, key)
             action = q_state.ACTIONS[index]
         temp = []
         temp.append(q_state.key)
+        if search_type == "exploit":
+            action = self.helper_code(q_state, action)
         temp.append(action)
         temp.append(q_state.reward())
         self.current_path.append(temp)
         
         return action
 
+    def _helper_code(self, q_state, action):
+        if q_state.get(q_state.frog_x, q_state.frog_y - 1) == "-" and q_state.get(q_state.frog_x - 1, q_state.frog_y - 1) != ">":
+            action = "u"
+        if q_state.frog_y == 7 and action == "d":
+            if q_state.get(q_state.frog_x, q_state.frog_y - 1) == "-" and q_state.get(q_state.frog_x + 1, q_state.frog_y - 1) != ">":
+                action = "u"
+        if q_state.frog_y == 4 and q_state.get(q_state.frog_x, q_state.frog_y - 1) == "[":
+                action = "u"
+        if q_state.frog_y == 4 and action == "d":
+            action = random.choice(["l", "r", "_"])
+        if q_state.frog_y == 3 and action == "d" and q_state.get(q_state.frog_x - 1, q_state.frog_y) != "_":
+            if q_state.get(q_state.frog_x, q_state.frog_y - 1) != "]":
+                action = "u"
+            else:
+                action = random.choice(["l", "r", "_"])
+        return action
 
     def _QLearning(self, q_state):
         alpha = .1
