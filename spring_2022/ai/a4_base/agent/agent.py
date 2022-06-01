@@ -34,31 +34,15 @@ class Q_State(State):
             self.get(self.frog_x - 1, self.frog_y - 1) or '_',
             self.get(self.frog_x, self.frog_y - 1) or '_',
             self.get(self.frog_x + 1, self.frog_y - 1) or '_',
-            '|',
-            #3 squarees in the 3 rows above F
-            self.get(self.frog_x, self.frog_y - 1) or '_',
-            self.get(self.frog_x, self.frog_y - 2) or '_',
-            self.get(self.frog_x, self.frog_y - 3) or '_',
-            '|',
+            #1 square to right of F
+            self.get(self.frog_x + 1, self.frog_y) or '_',
             #3 squares 1 row below F
             self.get(self.frog_x - 1, self.frog_y + 1) or '_',
             self.get(self.frog_x, self.frog_y + 1) or '_',
             self.get(self.frog_x + 1, self.frog_y + 1) or '_',
-            '|',
-            #3 squarees in the 3 rows below F
-            self.get(self.frog_x, self.frog_y + 1) or '_',
-            self.get(self.frog_x, self.frog_y + 2) or '_',
-            self.get(self.frog_x, self.frog_y + 3) or '_',
-            '|',
-            #3 squares to left of F
-            self.get(self.frog_x - 1, self.frog_y) or '_',
-            self.get(self.frog_x - 2, self.frog_y) or '_',
-            self.get(self.frog_x - 3, self.frog_y) or '_',
-            '|',
-            #3 squares to right of F
-            self.get(self.frog_x + 1, self.frog_y) or '_',
-            self.get(self.frog_x + 2, self.frog_y) or '_',
-            self.get(self.frog_x + 3, self.frog_y) or '_',
+            #1 square to left of F
+            self.get(self.frog_x - 1, self.frog_y) or '_'
+
         ])
 
     def reward(self):
@@ -116,7 +100,7 @@ class Agent:
     def save(self):
         '''Saves the Q-table to the JSON file'''
         with open(self.path, 'w') as f:
-            json.dump(self.q, f, indent = 1)
+            json.dump(self.q, f, indent = 2)
         return self
 
     def choose_action(self, state_string):
@@ -140,7 +124,9 @@ class Agent:
             self._QLearning(q_state)
         else:
             #just return max value in q table
-            pass
+            val = max(self.q[q_state.key])
+            index = self.q[q_state.key].index(val)
+            action = q_state.ACTIONS[index]
 
         #pdb.set_trace()
         return action
@@ -149,34 +135,24 @@ class Agent:
 
     def _add_to_QTable(self, key):
         if key not in self.q:
-            self.q[key] = {
-            "u" : 0,
-            "d" : 0,
-            "l" : 0,
-            "r" : 0,
-            "_" : 0}
-
+            self.q[key] = [0, 0, 0, 0, 0]
         self.save()
 
     def _max_action(self, q_state, key):
-        max_val = -math.inf
-        max_move = ""
-        for i in range(len(q_state.ACTIONS)):
-            a = q_state.ACTIONS[i]
-            val = self.q[key][a]
-            if val > max_val:
-                max_val = val
-                max_move = a
-        return max_val, max_move
+        array = self.q[key]
+        max_val = max(array)
+        index = array.index(max_val)
+        return index
 
     def _build_path(self, q_state, key):
         probability = random.random()
-        if probability <= .4:
+        if probability <= .3:
             #explore
             action = random.choice(q_state.ACTIONS)
         else:
             #exploit
-            val, action = self._max_action(q_state, key)
+            index = self._max_action(q_state, key)
+            action = q_state.ACTIONS[index]
         temp = []
         temp.append(q_state.key)
         temp.append(action)
@@ -202,9 +178,11 @@ class Agent:
 
             for i in range(len(self.current_path) -1, 0, -1):
                 key = self.current_path[i][0]
-                v, a = self._max_action(q_state, key)
-                q_value = (1-alpha) * sum + alpha * (reward + gamma * v)
-                self.q[self.current_path[i-1][0]][self.current_path[i-1][1]] = q_value
+                index = self._max_action(q_state, key)
+                q_value = (1-alpha) * sum + alpha * (reward + gamma * self.q[key][index])
+                action = self.current_path[i-1][1]
+                new_index = q_state.ACTIONS.index(action)
+                self.q[self.current_path[i-1][0]][new_index] = q_value
 
             #pdb.set_trace()
             if q_state.is_done == True:
