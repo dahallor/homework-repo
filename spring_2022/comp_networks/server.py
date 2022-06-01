@@ -29,6 +29,62 @@ class Server(Architecture):
             PDU[3] = self.MAX_VERSION
         return PDU
 
+
+    def _system_cmds(self, code, PDU_header, PDU_body):
+        #pdb.set_trace()
+        PDU_body_list = PDU_body.split(" ")
+        print(f"special commands: {PDU_header} {PDU_body}")
+        try:
+            pdu_list = PDU_body.split(" ")
+            chatroom_delimiter = pdu_list[1][0]
+        except IndexError:
+            chatroom_delimiter = None
+        
+        
+        if int(PDU_header[0]) == code.actions["Admin Level Request"]:
+            if bool(PDU_header[3]) == False:
+                PDU_header[0] = code.actions["Admin Level Rejected"]
+            if bool(PDU_header[3]) == True:
+                exe_cmd = False
+                if PDU_body_list[0] == "!add" and chatroom_delimiter == "&":
+                        self.ACTIVE_CHATROOMS.append(PDU_body_list[1])
+                        print(f"{PDU_body_list[1]} added!")
+                        PDU_header[0] = code.actions["Admin Level Command"]
+                        exe_cmd = True
+                if PDU_body_list[0] == "!del" and chatroom_delimiter == "&":
+                        self.ACTIVE_CHATROOMS.remove(PDU_body_list[1])
+                        print(f"{PDU_body_list[1]} removed!")
+                        exe_cmd = True
+                if exe_cmd == True:
+                    PDU_header[0] = code.actions["Admin Level Command"]
+                if exe_cmd == False:
+                    PDU_header[0] = code.actions["Admin Level Rejected"]
+    
+
+        if int(PDU_header[0]) == code.actions["Push MSG To Server"]:
+            PDU_header[0] = code.actions["Push MSG To Clients"]
+
+
+        if int(PDU_header[0]) == code.actions["Switch Chatroom"]:
+            #pdb.set_trace()
+            if chatroom_delimiter == "&" and PDU_body_list[1] in self.ACTIVE_CHATROOMS:
+                PDU_header[1] = PDU_body_list[1]
+                PDU_body = ""
+                for i in range(len(self.CHATLOG)):
+                    if PDU_header[1] == self.CHATLOG[i][0]:
+                        PDU_body += f"{self.CHATLOG[i][1]}: {self.CHATLOG[i][2]}\n"
+
+
+        if int(PDU_header[0]) == code.actions["List Chatrooms"]:
+            PDU_header[2] = "sys"
+            PDU_body = ""
+            for chatroom in self.ACTIVE_CHATROOMS:
+                PDU_body += chatroom
+                PDU_body += " "
+
+
+        return PDU_header, PDU_body
+
 #=============================================================Decode/Encode Methods=================================================================================
 
     def _decode_nonsession_PDU(self, conn):
@@ -36,7 +92,7 @@ class Server(Architecture):
         head_len = int(head)
         header = conn.recv(head_len).decode(self.FORMAT)
         PDU = header.split(";")
-        #Checks for correct version, returns a the accepted versions if they differ
+        #Checks for correct version, returns the accepted versions if they differ
         PDU = self._check_version(PDU)
         return PDU
 
@@ -79,14 +135,12 @@ class Server(Architecture):
         return PDU
 
     def _encode_session_PDU(self, code, commands, PDU, msg):
-        PDU, msg = commands.special_cmds(code, PDU, msg)
         print(f'encoding: {PDU} {msg}')
         self._session_header(PDU)
         self._session_body(msg)
 
     def _session_header(self, PDU):
         head = ""
-        PDU[0] = 32
         for i in range(len(PDU)):
             head += str(PDU[i])
             if i != len(PDU)-1:
@@ -108,28 +162,43 @@ class Server(Architecture):
             socket.send(body_len)
             socket.send(encoded_msg)
 
+    
+
 #============================================================Main Public Methods================================================================================
     def chatroom(self, v, code, commands, conn, addr, PDU):
-        print(f"[SUCCSES] {PDU[1]} has entered the chat: {self.CHATROOM}")
+        print(f"[SUCCSES] {PDU[1]} has entered the chat")
         self.CONNECTIONS[addr] = PDU[1:]
         self.ACTIVE_SOCKETS.append(conn)
         #While response code is not the exit response code, disseminate PDU to display messages and user info
-        while int(PDU[0]) != code.actions["Exit"]:
+        while True:
+            #Decode recv message
             PDU = self._decode_session_PDU(conn, addr)
             PDU_head = PDU[0].split(";")
             PDU_body = PDU[1]
-            print(f"chatroom loop: {PDU} {PDU_head} {PDU_body}")
+
+            #Check for certain special commands
+            PDU_head, PDU_body = self._system_cmds(code, PDU_head, PDU_body)
+
+            #send data back to clients
             self._encode_session_PDU(code, commands, PDU_head, PDU_body)
-            print(f"{PDU_head[1]} >> {PDU_head[2]}: {PDU_body}")
-            log_data = [PDU_head[1], PDU_head[2], PDU_body]
-            self.CHATLOG.append(log_data)
+            
+            #Archiving
+            if int(PDU_head[0]) != code.actions["Switch Chatroom"]:
+                log_data = [PDU_head[1], PDU_head[2], PDU_body]
+                self.CHATLOG.append(log_data)
             PDU = PDU_head
-        print(f"[CLOSING] {PDU[1]} has left the chat: {self.CHATROOM}")
+    
+            #Exit
+            if int(PDU[0]) == code.actions["Exit"]:
+                break
+        
+        #Closing Connection
+        print(f"[CLOSING] {PDU[2]} has left the chat")
         conn.close()
         del self.CONNECTIONS[addr]
-        self.ACTIVE_USERS.remove(PDU[1])
+        self.ACTIVE_USERS.remove(PDU[2])
         self.ACTIVE_SOCKETS.remove(conn)
-        #pdb.set_trace()
+
 
     def bad_connection(self, conn, header_info):
         print(f"[RETRYING] {header_info[1]} had bad connection request...")

@@ -10,6 +10,8 @@ class GUI:
         self.TEXT_COLOR = "#EAECEE"
         self.FONT = "helvetica 14"
         self.client = client
+        self.current_chatroom = "&general"
+        self.queue = []
 
     def _layout(self):
         self.root.title("Discourse")
@@ -43,27 +45,37 @@ class GUI:
         #self.input_field.bind("<Return>", self._enter_own_msg)
         self.enter_button.place(relx=1, rely=.5, width=45, anchor="e")
 
-        
+    def _insert_into_chatlog(self, formated_msg):
+        self.chatlog_label.configure(state=tk.NORMAL)
+        self.chatlog_label.insert(tk.END, formated_msg)
+        self.chatlog_label.configure(state=tk.DISABLED)
+        self.chatlog_label.see(tk.END)
         
     def _enter_own_msg(self, v, code, client_socket, PDU):
         #self.chatlog_label.configure(text=self.input_field.get())
         msg = self.input_field.get()
         self.input_field.delete(0, tk.END)
         formated_msg = f"{self.client.user}: {msg}\n"
-        self.chatlog_label.configure(state=tk.NORMAL)
-        self.chatlog_label.insert(tk.END, formated_msg)
-        self.chatlog_label.configure(state=tk.DISABLED)
-        self.chatlog_label.see(tk.END)
+        self._insert_into_chatlog(formated_msg)
+        PDU[1] = self.current_chatroom
         self.client._encode_session_PDU(v, code, client_socket, PDU, msg)
+        if int(PDU[0]) == code.actions["Exit"]:
+            self.root.destroy()
 
 
-    def _enter_others_msg(self, user, msg):
+    def _enter_others_msg(self, PDU, msg):
+        user = PDU[2]
+        chat = PDU[1]
+        if chat == self.current_chatroom:
+            formated_msg = f"{user}: {msg}\n"
+            self._insert_into_chatlog(formated_msg)
 
-        formated_msg = f"{user}: {msg}\n"
+    def _load_chatlog(self, head, msgs):
+        self.current_chatroom=head[1]
+        self.chatroom_name_label.configure(text=head[1])
         self.chatlog_label.configure(state=tk.NORMAL)
-        self.chatlog_label.insert(tk.END, formated_msg)
-        self.chatlog_label.configure(state=tk.DISABLED)
-        self.chatlog_label.see(tk.END)
+        self.chatlog_label.delete('1.0', tk.END)
+        self._insert_into_chatlog(msgs)
 
     def rec_loop(self, client_socket, PDU):
         while True:
@@ -71,8 +83,15 @@ class GUI:
             PDU_head = PDU[0].split(";")
             PDU_body = PDU[1]
             if PDU_head[2] != self.client.user:
-                self._enter_others_msg(PDU_head[2], PDU_body)
+                if int(PDU_head[0]) != 34:
+                    self._enter_others_msg(PDU_head, PDU_body)
+            if PDU_head[2] == self.client.user:
+                if int(PDU_head[0]) == 50:
+                    self.root.destroy()
+                if int(PDU_head[0]) == 34:
+                    self._load_chatlog(PDU_head, PDU_body)
             PDU = PDU_head
+            print(f"rec loop: {PDU} {PDU_body}")
 
 
     def run_GUI(self, v, code, PDU, client_socket):
@@ -85,6 +104,8 @@ class GUI:
         rec_thread.start()
 
         self.root.mainloop()
+        pdb.set_trace()
+        rec_thread.join()
 
 if __name__ == '__main__':
     c = Client()

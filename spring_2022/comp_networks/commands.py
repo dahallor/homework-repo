@@ -5,6 +5,7 @@ class Cmds:
         super().__init__()
         self.server = server
 
+    '''
     def _load_chatlog(self, chatroom):
         for log in self.CHATLOG:
             target_chatroom = log[0]
@@ -19,34 +20,35 @@ class Cmds:
             chatroom_delimiter = PDU_body[1][0]
         except IndexError:
             chatroom_delimiter = None
-        if int(PDU_header[0]) == code.actions["Admin Level Command"]:
-            match PDU_body_list[0]:
-                case "!add":
-                    if chatroom_delimiter == "&":
+        
+        match int(PDU_header[0]):
+            case code.actions["Admin Level Command"]:
+                if PDU_body_list[0] == "!add" and chatroom_delimiter == "&":
                         self.server.ACTIVE_CHATROOMS.append(PDU_body_list[1])
                         print(f"{PDU_body_list[1]} added!")
-                case "!del":
-                    if chatroom_delimiter == "&":
+                if PDU_body_list[0] == "!del" and chatroom_delimiter == "&":
                         self.server.ACTIVE_CHATROOMS.remove(PDU_body_list[1])
                         print(f"{PDU_body_list[1]} removed!")
-                case _:
-                    raise Exception("Admin command issue")
-        if int(PDU_header[0]) == code.actions["Nonadmin Command"]:
-            match PDU_body_list[0]:
-                case "!switch":
-                    if chatroom_delimiter == "&":
-                        PDU_header[1] = PDU_body_list[1]
-                        print(self.server.CLEAR_SCREEN)
-                        print(f"Switched to {PDU_body_list[1]}")
-                        self._load_chatlog(PDU_body_list[1])
-                case "!list":
-                    PDU_header[2] = "sys"
-                    PDU_body = ""
-                    for chatroom in self.server.ACTIVE_CHATROOMS:
-                        PDU_body += chatroom
-                        PDU_body += " "
-                case "!exit":
-                    PDU_header[0] = code.actions["Exit"]
-                case _:
-                    raise Exception("Nonadmin command issue")
+        
+
+            case code.actions["Push MSG To Server"]:
+                PDU_header[0] = code.actions["Push MSG To Clients"]
+
+            case code.actions["Switch Chatroom"]:
+                pdb.set_trace()
+                if chatroom_delimiter == "&":
+                    PDU_header[1] = PDU_body_list[1]
+                    print(f"Switched to {PDU_body_list[1]}")
+                    self._load_chatlog(PDU_body_list[1])
+            case code.actions["List Chatrooms"]:
+                PDU_header[2] = "sys"
+                PDU_body = ""
+                for chatroom in self.server.ACTIVE_CHATROOMS:
+                    PDU_body += chatroom
+                    PDU_body += " "
+            case _:
+                raise Exception("System Commands Issue")
+
+
         return PDU_header, PDU_body
+        '''
