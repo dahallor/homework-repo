@@ -21,6 +21,13 @@ class Server(Architecture):
         self.CLEAR_SCREEN = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
 
 #==============================================================Private Helper Methods================================================================================
+    def _str_to_bool(self, value):
+        if value == "False":
+            return_val = False
+        if value == "True":
+            return_val = True
+        return return_val
+    
     def _check_version(self, PDU):
         if float(PDU[3]) == self.MAX_VERSION:
             PDU[0] = 21
@@ -42,23 +49,36 @@ class Server(Architecture):
         
         
         if int(PDU_header[0]) == code.actions["Admin Level Request"]:
-            if bool(PDU_header[3]) == False:
+            admin_level = self._str_to_bool(PDU_header[3])
+            if admin_level == False:
                 PDU_header[0] = code.actions["Admin Level Rejected"]
-            if bool(PDU_header[3]) == True:
+            if admin_level == True:
                 exe_cmd = False
                 if PDU_body_list[0] == "!add" and chatroom_delimiter == "&":
                         self.ACTIVE_CHATROOMS.append(PDU_body_list[1])
                         print(f"{PDU_body_list[1]} added!")
                         PDU_header[0] = code.actions["Admin Level Command"]
+                        PDU_header[2] = "sys"
                         exe_cmd = True
                 if PDU_body_list[0] == "!del" and chatroom_delimiter == "&":
                         self.ACTIVE_CHATROOMS.remove(PDU_body_list[1])
                         print(f"{PDU_body_list[1]} removed!")
-                        exe_cmd = True
+                        PDU_header[2] = "sys"
+                        if PDU_body_list[1] != "&general":
+                            to_delete = []
+                            for i in range(len(self.CHATLOG)):
+                                if PDU_body_list[1] == self.CHATLOG[i][0]:
+                                    to_delete.append(self.CHATLOG[i])
+                            for i in range(len(to_delete)):
+                                self.CHATLOG.remove(to_delete[i])
+                            exe_cmd = True
+                        if PDU_body_list[1] == "&general":
+                            PDU_body = "Cannot delete '&general' chatroom"
                 if exe_cmd == True:
                     PDU_header[0] = code.actions["Admin Level Command"]
                 if exe_cmd == False:
                     PDU_header[0] = code.actions["Admin Level Rejected"]
+            #pdb.set_trace()
     
 
         if int(PDU_header[0]) == code.actions["Push MSG To Server"]:
@@ -76,13 +96,13 @@ class Server(Architecture):
 
 
         if int(PDU_header[0]) == code.actions["List Chatrooms"]:
-            PDU_header[2] = "sys"
+            #PDU_header[2] = "sys"
             PDU_body = ""
             for chatroom in self.ACTIVE_CHATROOMS:
                 PDU_body += chatroom
                 PDU_body += " "
 
-
+        print(f"system eval: {PDU_header} {self.ACTIVE_CHATROOMS}")
         return PDU_header, PDU_body
 
 #=============================================================Decode/Encode Methods=================================================================================
@@ -183,7 +203,7 @@ class Server(Architecture):
             self._encode_session_PDU(code, commands, PDU_head, PDU_body)
             
             #Archiving
-            if int(PDU_head[0]) != code.actions["Switch Chatroom"]:
+            if int(PDU_head[0]) != code.actions["Switch Chatroom"] and int(PDU_head[0]) != code.actions["List Chatrooms"] and PDU_head[2] != "sys":
                 log_data = [PDU_head[1], PDU_head[2], PDU_body]
                 self.CHATLOG.append(log_data)
             PDU = PDU_head

@@ -56,7 +56,9 @@ class GUI:
         msg = self.input_field.get()
         self.input_field.delete(0, tk.END)
         formated_msg = f"{self.client.user}: {msg}\n"
-        self._insert_into_chatlog(formated_msg)
+        msg_list = msg.split(" ")
+        if msg_list[0] != "!list" and msg_list[0] != "!switch" and msg_list[0] != "!add" and msg_list[0] != "!del":
+            self._insert_into_chatlog(formated_msg)
         PDU[1] = self.current_chatroom
         self.client._encode_session_PDU(v, code, client_socket, PDU, msg)
         if int(PDU[0]) == code.actions["Exit"]:
@@ -77,19 +79,25 @@ class GUI:
         self.chatlog_label.delete('1.0', tk.END)
         self._insert_into_chatlog(msgs)
 
-    def rec_loop(self, client_socket, PDU):
+    def rec_loop(self, v, code, client_socket, PDU):
         while True:
             PDU = self.client._decode_session_PDU(client_socket)
             PDU_head = PDU[0].split(";")
             PDU_body = PDU[1]
-            if PDU_head[2] != self.client.user:
-                if int(PDU_head[0]) != 34:
+            if PDU_head[2] != self.client.user and PDU_head[2] != "sys":
+                if int(PDU_head[0]) != 34 and int(PDU_head[0]) != 33:
                     self._enter_others_msg(PDU_head, PDU_body)
             if PDU_head[2] == self.client.user:
                 if int(PDU_head[0]) == 50:
                     self.root.destroy()
                 if int(PDU_head[0]) == 34:
                     self._load_chatlog(PDU_head, PDU_body)
+                if int(PDU_head[0]) == 33:
+                    PDU_head[2] = "sys"
+                    formated_msg = f"{PDU_head[2]}: {PDU_body}\n"
+                    self._insert_into_chatlog(formated_msg)
+                if int(PDU_head[0]) == 32:
+                    continue
             PDU = PDU_head
             print(f"rec loop: {PDU} {PDU_body}")
 
@@ -100,12 +108,12 @@ class GUI:
         self._layout()
         self._elements(v, code, client_socket, PDU)
         self._grid()
-        rec_thread = threading.Thread(target=self.rec_loop, args = (client_socket, PDU))
+        rec_thread = threading.Thread(target=self.rec_loop, args = (v, code, client_socket, PDU))
+        rec_thread.daemon = True
         rec_thread.start()
 
         self.root.mainloop()
-        pdb.set_trace()
-        rec_thread.join()
+        sys.exit()
 
 if __name__ == '__main__':
     c = Client()
