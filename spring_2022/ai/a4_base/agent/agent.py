@@ -129,8 +129,8 @@ class Agent:
             action = q_state.ACTIONS[index]
 
         #Helper code
-
-        pdb.set_trace()
+        action = self._helper_code(q_state, action)
+        #pdb.set_trace()
         return action
         #return random.choice(State.ACTIONS)
 
@@ -161,7 +161,7 @@ class Agent:
         temp = []
         temp.append(q_state.key)
         if search_type == "exploit":
-            action = self.helper_code(q_state, action)
+            action = self._helper_code(q_state, action)
         temp.append(action)
         temp.append(q_state.reward())
         self.current_path.append(temp)
@@ -179,7 +179,7 @@ class Agent:
         if q_state.frog_y == 4 and action == "d":
             action = random.choice(["l", "r", "_"])
         if q_state.frog_y == 3 and action == "d" and q_state.get(q_state.frog_x - 1, q_state.frog_y) != "_":
-            if q_state.get(q_state.frog_x, q_state.frog_y - 1) != "]":
+            if q_state.get(q_state.frog_x, q_state.frog_y - 1) == "]":
                 action = "u"
             else:
                 action = random.choice(["l", "r", "_"])
